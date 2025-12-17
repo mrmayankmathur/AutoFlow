@@ -10,7 +10,6 @@
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge)
 
 </div>
----
 
 ## 📋 Table of Contents
 
