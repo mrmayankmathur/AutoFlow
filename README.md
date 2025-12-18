@@ -7,7 +7,7 @@
 
 ![Status](https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
-![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge)
 
 </div>
 
@@ -28,11 +28,11 @@
 
 ## 🤖 Introduction
 
-**KriyaLabs** is a modern, AI-native SaaS application built to demonstrate how real-world, production-ready systems are engineered—not just demo applications.
+**KriyaLabs** is a production-grade, event-driven SaaS platform designed to democratize workflow automation. Built to rival industry giants like Zapier and N8N, it empowers users to design complex, multi-step automations using a visual drag-and-drop canvas.
 
-It combines a robust backend architecture, event-driven workflows, and a polished, high-impact UI. The backend architecture and async workflows follow Antonio’s engineering-first approach, while the UI and landing experience draw inspiration from Web Prodigies and Aceternity UI.
+Unlike traditional tools, it combines **reliability** with **aesthetics**. Under the hood, it runs on a high-performance execution engine powered by **Inngest**, ensuring 100% reliable background job processing, retries, & flow control. The user experience is elevated by a cutting-edge interface inspired by **Aceternity UI**, featuring parallax effects, 3D visualizations, and glassmorphism that makes automation feel magical.
 
-This project is designed to hold up during senior-level technical deep dives, with an emphasis on scalability, maintainability, and clean abstractions.
+Whether you are chaining AI agents (OpenAI, Gemini), listening for Webhooks, or managing subscriptions via Polar, KriyaLabs offers a seamless, type-safe, and visually immersive environment for modern developers and creators.
 
 ---
 
@@ -58,9 +58,9 @@ Every architectural decision is intentional and explainable.
 - Aceternity UI
 
 ### Backend & Infrastructure
-- Convex
+- PostgreSQL (Neon)
 - Inngest
-- Clerk
+- Better Auth
 
 ### AI & Tooling
 - OpenAI APIs
@@ -71,10 +71,10 @@ Every architectural decision is intentional and explainable.
 
 ## 🔋 Core Features
 
-- **Production-Grade Authentication** using Clerk  
+- **Production-Grade Authentication** using Better Auth  
 - **Event-Driven Background Jobs** with Inngest  
-- **Clean Backend Architecture** using Convex functions  
-- **Modern Landing Page** inspired by Web Prodigies  
+- **Clean Backend Architecture** using PostgreSQL  
+- **Modern Landing Page**  
 - **Scalable Data Models** designed for real growth  
 - **AI-First System Design** (not bolted-on APIs)  
 - **Reusable, Typed Codebase** for long-term maintainability  
@@ -105,8 +105,9 @@ Every architectural decision is intentional and explainable.
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/kriyalabs.git
+git clone https://github.com/mrmayankmathur/kriyalabs.git
 cd kriyalabs
+```
 
 ---
 
@@ -123,21 +124,22 @@ npm install
 Create a `.env` file in the project root:
 
 ```env
-# Convex
-CONVEX_DEPLOYMENT=
-NEXT_PUBLIC_CONVEX_URL=
+# Database
+DATABASE_URL=
 
-# Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+# Better Auth
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=http://localhost:3000 
+
+# Google Auth
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 
 # OpenAI
 OPENAI_API_KEY=
 ```
 
-Replace the values with your actual credentials from Convex, Clerk, and OpenAI.
+Replace the values with your actual credentials from the Database provider, Better Auth, Google Cloud, and OpenAI.
 
 ---
 
@@ -162,7 +164,7 @@ See the `LICENSE` file for more information.
 
 * **Name:** Mayank Mathur
 * **Email:** [mrmayankmathur@gmail.com](mailto:mrmayankmathur@gmail.com)
-* **Repository:** [https://github.com/your-username/kriyalabs](https://github.com/your-username/kriyalabs)
+* **Repository:** [https://github.com/mrmayankmathur/kriyalabs](https://github.com/mrmayankmathur/kriyalabs)
 
 ---
 
