@@ -190,6 +190,7 @@ export function LoginForm() {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -197,22 +198,27 @@ export function LoginForm() {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    await authClient.signIn.email(
-      {
-        email: values.email,
-        password: values.password,
-        callbackURL: "/",
-      },
-      {
-        onSuccess: () => {
-          toast.success("Logged in successfully");
-          router.push("/");
+    try {
+      await authClient.signIn.email(
+        {
+          email: values.email,
+          password: values.password,
+          callbackURL: "/",
+          rememberMe: rememberMe,
         },
-        onError: (ctx) => {
-          toast.error(ctx.error.message);
-        },
-      }
-    );
+        {
+          onSuccess: () => {
+            toast.success("Logged in successfully");
+            router.push("/");
+          },
+          onError: (ctx) => {
+            toast.error(ctx.error.message);
+          },
+        }
+      );
+    } catch (error) {
+      toast.error(`An unexpected error occurred. ${error} Please try again.`);
+    }
   };
 
   const isPending = form.formState.isSubmitting;
@@ -318,7 +324,10 @@ export function LoginForm() {
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
+                            aria-label={
+                              showPassword ? "Hide password" : "Show password"
+                            }
                           >
                             {showPassword ? (
                               <EyeOff size={18} />
@@ -335,7 +344,12 @@ export function LoginForm() {
 
                 <div className="flex items-center justify-between text-sm">
                   <label className="flex items-center gap-2">
-                    <input type="checkbox" />
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+                    />
                     Remember me
                   </label>
                   <Link
@@ -349,7 +363,7 @@ export function LoginForm() {
                 <Button className="w-full" disabled={isPending}>
                   {isPending ? (
                     <>
-                      <Spinner /> <p>Signing in...</p>
+                      <Spinner /> <span>Signing in...</span>
                     </>
                   ) : (
                     "Sign In"
