@@ -7,7 +7,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "inngest:dev": "inngest-cli dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -55,6 +56,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "embla-carousel-react": "^8.6.0",
+    "inngest": "^3.48.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.561.0",
     "motion": "^12.23.26",
@@ -82,6 +84,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
+    "inngest-cli": "^1.15.1",
     "prisma": "^7.1.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",

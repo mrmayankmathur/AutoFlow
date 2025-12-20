@@ -21,7 +21,7 @@ export default function Home() {
           <ContainerScroll
             titleComponent={
               <div className="flex items-center flex-col">
-                <Link href="/workflows">
+                <Link href="/dashboard">
                   <Button
                     size={"lg"}
                     className="p-8 lg:mb-8 mb-4 text-2xl w-full sm:w-fit border-t-2 rounded-full border-[#4D4D4D] bg-[#1F1F1F] hover:bg-white group transition-all flex items-center justify-center gap-4 hover:shadow-xl hover:shadow-neutral-500 duration-500"
