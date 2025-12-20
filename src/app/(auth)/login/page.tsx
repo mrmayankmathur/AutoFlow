@@ -5,10 +5,12 @@ const Page = async () => {
   await requireUnauth();
 
   return (
-    <div>
+    <div className="dark">
       <LoginForm />
     </div>
   );
 };
+
+Page.theme = "light";
 
 export default Page;

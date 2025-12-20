@@ -48,6 +48,10 @@ export function RegisterForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [pendingSocialProvider, setPendingSocialProvider] = useState<
+    "google" | "github" | null
+  >(null);
+
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -58,6 +62,17 @@ export function RegisterForm() {
       confirmPassword: "",
     },
   });
+
+  const handleSignIn = async (provider: "google" | "github") => {
+    setPendingSocialProvider(provider);
+    await authClient.signIn.social({
+      provider: provider,
+      callbackURL: "/", // Redirect after successful login
+    });
+    setPendingSocialProvider(null);
+    toast.success("Account created successfully");
+  };
+
   const isPending = form.formState.isSubmitting;
 
   const onSubmit = async (values: RegisterFormValues) => {
@@ -81,7 +96,10 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+    <div
+      style={{ backgroundColor: "white", color: "#0f172a" }}
+      className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden"
+    >
       <div
         className="absolute inset-0 bg-cover bg-center md:blur-[18px] scale-[1.4]"
         style={{
@@ -99,7 +117,7 @@ export function RegisterForm() {
       <div className="relative z-10 w-full flex justify-center">
         {/* ⬇️ KEEP YOUR EXISTING CARD CONTAINER HERE */}
 
-        <div className="flex w-full max-w-[91vw] h-[91vh] overflow-hidden rounded-3xl bg-white">
+        <div className="flex w-full max-w-[95vw] h-[91vh] overflow-hidden rounded-3xl bg-white">
           {/* LEFT IMAGE */}
           <div className="relative hidden w-1/2 md:block">
             <Image
@@ -131,10 +149,6 @@ export function RegisterForm() {
           </div>
 
           <div className="flex w-full flex-col justify-center px-8 py-12 md:w-1/2 md:px-14">
-            <div className="lg:hidden mb-6 flex items-center gap-2">
-              <span className="h-6 w-6 rounded-full bg-black" />
-              <span className="text-sm font-semibold">KriyaLabs</span>
-            </div>
             <h2 className="font-serif text-3xl">Create Account</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Get started with your free account
@@ -157,6 +171,8 @@ export function RegisterForm() {
                             placeholder="First Name"
                             {...field}
                             value={field.value || ""}
+                            style={{ backgroundColor: "white", color: "black" }}
+                            className="bg-white! text-black! border-[#E5E5E5]! placeholder:text-[#737373] focus-visible:ring-[#737373]!"
                           />
                         </FormControl>
                         <FormMessage />
@@ -174,6 +190,8 @@ export function RegisterForm() {
                             placeholder="Last Name"
                             {...field}
                             value={field.value || ""}
+                            style={{ backgroundColor: "white", color: "black" }}
+                            className="bg-white! text-black! border-[#E5E5E5]! placeholder:text-[#737373]! focus-visible:ring-[#737373]!"
                           />
                         </FormControl>
                         <FormMessage />
@@ -193,6 +211,8 @@ export function RegisterForm() {
                           placeholder="Enter your email"
                           {...field}
                           value={field.value || ""}
+                          style={{ backgroundColor: "white", color: "black" }}
+                          className="bg-white! text-black! border-[#E5E5E5]! placeholder:text-[#737373]! focus-visible:ring-[#737373]!"
                         />
                       </FormControl>
                       <FormMessage />
@@ -212,6 +232,8 @@ export function RegisterForm() {
                             placeholder="Enter your password"
                             {...field}
                             value={field.value || ""}
+                            style={{ backgroundColor: "white", color: "black" }}
+                            className="bg-white! text-black! border-[#E5E5E5]! placeholder:text-[#737373]! focus-visible:ring-[#737373]!"
                           />
                           <button
                             type="button"
@@ -246,6 +268,8 @@ export function RegisterForm() {
                             placeholder="Enter to confirm the password"
                             {...field}
                             value={field.value || ""}
+                            style={{ backgroundColor: "white", color: "black" }}
+                            className="bg-white! text-black! border-[#E5E5E5]! placeholder:text-[#737373]! focus-visible:ring-[#737373]!"
                           />
                           <button
                             type="button"
@@ -272,7 +296,10 @@ export function RegisterForm() {
                   )}
                 />
 
-                <Button className="w-full" disabled={isPending}>
+                <Button
+                  className="w-full bg-[#171717] text-white hover:bg-[#2E2E2E]"
+                  disabled={isPending}
+                >
                   {isPending ? (
                     <>
                       <Spinner /> <p>Creating your account...</p>
@@ -299,9 +326,20 @@ export function RegisterForm() {
                     variant="outline"
                     type="button"
                     disabled={isPending}
-                    className="w-full"
+                    style={{ backgroundColor: "white", color: "#0f172a" }}
+                    className="w-full bg-white! text-slate-900! border-slate-200! hover:bg-slate-50!"
+                    onClick={() => handleSignIn("github")}
                   >
-                    <Github className="mr-2 h-4 w-4" />
+                    {pendingSocialProvider === "github" ? (
+                      <Spinner />
+                    ) : (
+                      <Image
+                        alt="github"
+                        src="https://img.icons8.com/?size=100&id=AZOZNnY73haj&format=png&color=000000"
+                        width={24}
+                        height={24}
+                      />
+                    )}
                     GitHub
                   </Button>
 
@@ -309,33 +347,27 @@ export function RegisterForm() {
                     variant="outline"
                     type="button"
                     disabled={isPending}
-                    className="w-full"
+                    style={{ backgroundColor: "white", color: "#0f172a" }}
+                    className="w-full bg-white! text-slate-900! border-slate-200! hover:bg-slate-50!"
+                    onClick={() => handleSignIn("google")}
                   >
-                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                      <path
-                        fill="#4285F4"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    {pendingSocialProvider === "google" ? (
+                      <Spinner />
+                    ) : (
+                      <Image
+                        alt="google"
+                        src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s96-fcrop64=1,00000000ffffffff-rw"
+                        width={20}
+                        height={20}
                       />
-                      <path
-                        fill="#34A853"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      />
-                    </svg>
+                    )}
                     Google
                   </Button>
                 </div>
               </form>
             </Form>
 
-            <p className="mt-8 text-center text-sm text-muted-foreground">
+            <p className="lg:mt-8 mt-4 text-center text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link href="/login" className="font-medium text-black">
                 Login
