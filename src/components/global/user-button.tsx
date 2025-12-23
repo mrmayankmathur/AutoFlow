@@ -14,15 +14,17 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Props = {
-  user: {
+  user?: {
     name?: string | null;
     email?: string | null;
     image?: string | null;
-  };
+  } | null;
 };
 
 const UserButton = ({ user }: Props) => {
   const router = useRouter();
+
+  if (!user) return null;
 
   const handleSignOut = async () => {
     await authClient.signOut({
