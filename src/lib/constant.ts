@@ -92,16 +92,6 @@ export const products = [
   },
 ];
 
-export const menuOptions = [
-  { name: "Dashboard", Component: Home, href: "/workflows" },
-  { name: "Workflows", Component: Workflows, href: "/workflows" },
-  { name: "Settings", Component: Settings, href: "/settings" },
-  { name: "Connections", Component: Category, href: "/connections" },
-  { name: "Billing", Component: Payment, href: "/billing" },
-  { name: "Templates", Component: Templates, href: "/templates" },
-  { name: "Logs", Component: Logs, href: "/logs" },
-];
-
 export const EditorCanvasDefaultCardTypes = {
   Email: { description: "Send and email to a user", type: "Action" },
   Condition: {
