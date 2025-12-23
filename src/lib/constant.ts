@@ -93,8 +93,8 @@ export const products = [
 ];
 
 export const menuOptions = [
-  { name: "Dashboard", Component: Home, href: "/dashboard" },
-  { name: "Workflows", Component: Workflows, href: "/dashboard" },
+  { name: "Dashboard", Component: Home, href: "/workflows" },
+  { name: "Workflows", Component: Workflows, href: "/workflows" },
   { name: "Settings", Component: Settings, href: "/settings" },
   { name: "Connections", Component: Category, href: "/connections" },
   { name: "Billing", Component: Payment, href: "/billing" },
