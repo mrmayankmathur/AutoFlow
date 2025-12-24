@@ -1,6 +1,7 @@
 import { CardBody, CardContainer, CardItem } from "@/components/global/3d-card";
 import { HeroParallax } from "@/components/global/connect-parallax";
 import { ContainerScroll } from "@/components/global/container-scroll-animation";
+import { ForceDarkMode } from "@/components/global/force-dark-mode";
 import { InfiniteMovingCards } from "@/components/global/infinite-moving-cards";
 import { LampComponent } from "@/components/global/lamp";
 import Navbar from "@/components/global/navbar";
@@ -11,9 +12,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
-  //WIP: remove fault IMAge for home page
   return (
     <main className="flex items-center overflow-hidden justify-center flex-col">
+      <ForceDarkMode />
       <Navbar />
       <section className="h-screen w-full  bg-neutral-950 rounded-md overflow-visible! relative flex flex-col items-center  antialiased">
         <div className="absolute inset-0  h-full w-full items-center px-5 py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_35%,#223_100%)]"></div>

@@ -1,6 +1,11 @@
 import SidebarShell from "@/components/global/sidebar/sidebar-shell";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
+import { redirect } from "next/navigation";
+import InfoBar from "@/components/global/infobar";
 
 export default async function DashboardLayout({
   children,
@@ -11,6 +16,26 @@ export default async function DashboardLayout({
     headers: await headers(),
   });
 
+  if (!session) {
+    redirect("/login");
+  }
+
   const user = session?.user;
-  return <SidebarShell user={user}>{children}</SidebarShell>;
+  return (
+    <SidebarShell user={user}>
+      <NextSSRPlugin
+        /**
+         * The `extractRouterConfig` will extract **only** the route configs
+         * from the router to prevent additional information from being
+         * leaked to the client. The data passed to the client is the same
+         * as if you were to fetch `/api/uploadthing` directly.
+         */
+        routerConfig={extractRouterConfig(ourFileRouter)}
+      />
+      <div className="w-screen sticky top-0 z-10">
+        <InfoBar />
+      </div>
+      <div className="w-screen overflow-y-clip">{children}</div>
+    </SidebarShell>
+  );
 }

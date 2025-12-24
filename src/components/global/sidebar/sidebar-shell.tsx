@@ -7,6 +7,7 @@ import {
   FolderOpenIcon,
   HistoryIcon,
   KeyIcon,
+  Settings,
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -117,9 +118,15 @@ export default function SidebarShell({ user, children }: Props) {
           </div>
 
           <div className="flex flex-col gap-4">
-            {/* Theme toggle */}
-            <div className="-ml-[5px] flex items-center gap-2">
-              <ModeToggle />
+            {/* Upgrade to Pro */}
+            <div className="flex items-center gap-2">
+              <SidebarActionButton
+                onClick={() => router.push("/settings")}
+                className="-ml-[5px] flex items-center gap-2 border border-neutral-200 dark:border-neutral-700 px-2"
+              >
+                <Settings className="h-4 w-4 shrink-0" />
+              </SidebarActionButton>
+
               {open && (
                 <span
                   className={cn(
@@ -127,7 +134,7 @@ export default function SidebarShell({ user, children }: Props) {
                     open ? "opacity-100" : "opacity-0"
                   )}
                 >
-                  Toggle Theme
+                  Settings
                 </span>
               )}
             </div>
@@ -193,7 +200,7 @@ export default function SidebarShell({ user, children }: Props) {
             "overflow-hidden"
           )}
         >
-          <div className="h-full overflow-y-auto py-6 px-0 sm:-px-6">
+          <div className="h-full overflow-y-auto pt-0 px-0 sm:-px-6">
             {children}
           </div>
         </div>
