@@ -20,6 +20,8 @@ import { ModeToggle } from "@/components/global/mode-toggle";
 import { SidebarActionButton } from "@/components/global/sidebar/sidebar-action-button";
 import { motion } from "framer-motion";
 import UserButton from "../user-button";
+import { authClient } from "@/lib/auth-client";
+import { useHasActiveSubscription } from "@/features/subscriptions/hooks/use-subscription";
 
 type Props = {
   user?: {
@@ -34,6 +36,8 @@ export default function SidebarShell({ user, children }: Props) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  const { hasActiveSubscription, isLoading } = useHasActiveSubscription();
 
   const links = [
     {
@@ -140,30 +144,32 @@ export default function SidebarShell({ user, children }: Props) {
             </div>
 
             {/* Upgrade to Pro */}
-            <div className="flex items-center gap-2">
-              <SidebarActionButton
-                onClick={() => router.push("/upgrade")}
-                className="-ml-[5px] flex items-center gap-2 border border-neutral-200 dark:border-neutral-700 px-2"
-              >
-                <Sparkles className="h-4 w-4 shrink-0" />
-              </SidebarActionButton>
-
-              {open && (
-                <span
-                  className={cn(
-                    "text-neutral-800 dark:text-neutral-200 transition-opacity duration-300 ease-in-out",
-                    open ? "opacity-100" : "opacity-0"
-                  )}
+            {!hasActiveSubscription && !isLoading && (
+              <div className="flex items-center gap-2">
+                <SidebarActionButton
+                  onClick={() => authClient.checkout({ slug: "KriyaLabs-Pro" })}
+                  className="-ml-[5px] flex items-center gap-2 border border-neutral-200 dark:border-neutral-700 px-2"
                 >
-                  Upgrade to Pro
-                </span>
-              )}
-            </div>
+                  <Sparkles className="h-4 w-4 shrink-0" />
+                </SidebarActionButton>
+
+                {open && (
+                  <span
+                    className={cn(
+                      "text-neutral-800 dark:text-neutral-200 transition-opacity duration-300 ease-in-out",
+                      open ? "opacity-100" : "opacity-0"
+                    )}
+                  >
+                    Upgrade to Pro
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Billing Portal */}
             <div className="flex items-center gap-2">
               <SidebarActionButton
-                onClick={() => router.push("/upgrade")}
+                onClick={() => authClient.customer.portal()}
                 className="-ml-[5px] flex items-center gap-2 border border-neutral-200 dark:border-neutral-700 px-2"
               >
                 <CreditCardIcon className="h-4 w-4 shrink-0" />
