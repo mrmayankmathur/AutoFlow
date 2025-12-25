@@ -7,7 +7,7 @@ import { LampComponent } from "@/components/global/lamp";
 import Navbar from "@/components/global/navbar";
 import { Button } from "@/components/ui/button";
 import { clients, products } from "@/lib/constant";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -71,14 +71,15 @@ export default function Home() {
                 up {"you'll"} never leave us after this!
                 <ul className="my-4 flex flex-col gap-2">
                   <li className="flex items-center gap-2">
-                    <CheckIcon />3 Free automations
+                    <XIcon />
+                    Free automations
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckIcon />
-                    100 tasks per month
+                    <XIcon />
+                    No tasks per month
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckIcon />
+                    <XIcon />
                     Two-step Actions
                   </li>
                 </ul>
@@ -108,7 +109,7 @@ export default function Home() {
                 className="text-xl font-bold text-neutral-600 dark:text-white "
               >
                 Pro Plan
-                <h2 className="text-6xl ">$29</h2>
+                <h2 className="text-6xl ">$29.99</h2>
               </CardItem>
               <CardItem
                 translateZ="60"
@@ -154,8 +155,8 @@ export default function Home() {
                 translateZ="50"
                 className="text-xl font-bold text-neutral-600 dark:text-white "
               >
-                Unlimited
-                <h2 className="text-6xl ">$99</h2>
+                Enterprise
+                <h2 className="text-6xl ">Contact</h2>
               </CardItem>
               <CardItem
                 translateZ="60"
@@ -165,11 +166,12 @@ export default function Home() {
                 up {"you'll"} never leave us after this!
                 <ul className="my-4 flex flex-col gap-2">
                   <li className="flex items-center gap-2">
-                    <CheckIcon />3 Free automations
+                    <CheckIcon />
+                    Unlimited automations
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckIcon />
-                    100 tasks per month
+                    Unlimited tasks per month
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckIcon />
@@ -190,7 +192,7 @@ export default function Home() {
                   as="button"
                   className="px-4 py-2 rounded-xl bg-black dark:bg-white dark:text-black text-white text-xs font-bold"
                 >
-                  Get Started Now
+                  Contact Sales
                 </CardItem>
               </div>
             </CardBody>

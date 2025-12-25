@@ -3,6 +3,14 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "@/lib/db";
 import { Resend } from "resend";
 import { VerifyEmailTemplate } from "@/components/global/emails/verify-email";
+import { polarClient } from "./polar";
+import {
+  polar,
+  checkout,
+  portal,
+  usage,
+  webhooks,
+} from "@polar-sh/better-auth";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -19,7 +27,6 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      // Use Resend's React integration
       await resend.emails.send({
         from: "Acme <onboarding@resend.dev>",
         to: "mrmayankmathur@gmail.com",
@@ -40,4 +47,23 @@ export const auth = betterAuth({
       autoSignIn: true,
     },
   },
+  plugins: [
+    polar({
+      client: polarClient,
+      createCustomerOnSignUp: true,
+      use: [
+        checkout({
+          products: [
+            {
+              productId: "511a0ae2-8fa8-4b7f-9963-e663d19cda6b",
+              slug: "KriyaLabs-Pro",
+            },
+          ],
+          successUrl: process.env.POLAR_SUCCESS_URL,
+          authenticatedUsersOnly: true,
+        }),
+        portal(),
+      ],
+    }),
+  ],
 });
