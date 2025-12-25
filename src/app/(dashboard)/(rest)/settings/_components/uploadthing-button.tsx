@@ -22,8 +22,12 @@ const UploadThingButton = ({ onUpload }: Props) => {
         // res is an array of uploaded files
         if (res && res[0]) {
           const fileUrl = res[0].url;
-          await onUpload(fileUrl);
-          router.refresh();
+          try {
+            await onUpload(fileUrl);
+            router.refresh();
+          } catch (error) {
+            console.error("Upload callback failed:", error);
+          }
         }
       }}
       onUploadError={(error: Error) => {
