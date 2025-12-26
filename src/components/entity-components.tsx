@@ -1,6 +1,7 @@
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, SearchIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { Input } from "./ui/input";
 
 type EntityHeaderProps = {
   title: string;
@@ -73,6 +74,72 @@ export const EntityContainer = ({
           {children}
         </div>
         {pagination}
+      </div>
+    </div>
+  );
+};
+
+interface EntitySearchProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}
+
+export const EntitySearch = ({
+  value,
+  onChange,
+  placeholder,
+}: EntitySearchProps) => {
+  return (
+    <div className="relative ml-auto">
+      <span className="flex items-center rounded-full bg-muted px-4 py-[0.5px]">
+        <SearchIcon className="" />
+        <Input
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="border-none bg-transparent rounded-full focus-visible:ring-0 focus-visible:ring-offset-0 pl-6"
+        />
+      </span>
+    </div>
+  );
+};
+
+interface EntityPaginationProps {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  disabled?: boolean;
+}
+
+export const EntityPagination = ({
+  page,
+  totalPages,
+  onPageChange,
+  disabled,
+}: EntityPaginationProps) => {
+  return (
+    <div className="flex items-center justify-between md:px-8 md:-ml-6 sm:-ml-2 gap-x-2 w-full">
+      <div className="flex-1 text-sm text-muted-foreground">
+        Page {page} of {totalPages || 1}
+      </div>
+      <div className="flex items-center justify-end gap-x-2 py-4">
+        <Button
+          disabled={disabled || page === 1 || totalPages === 0}
+          onClick={() => onPageChange(Math.max(1, page - 1))}
+          size="sm"
+          variant="outline"
+        >
+          Previous
+        </Button>
+        <Button
+          disabled={disabled || page === totalPages || totalPages === 0}
+          onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+          size="sm"
+          variant="outline"
+        >
+          Next
+        </Button>
       </div>
     </div>
   );
