@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import { Book, Headphones, Search, LogOut, Settings } from "lucide-react";
+import { Book, Headphones, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Tooltip,
@@ -17,51 +17,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { useBilling } from "@/providers/billing-provider";
-// import { onPaymentDetails } from "@/app/(main)/(pages)/billing/_actions/payment-connecetions";
-import { authClient } from "@/lib/auth-client"; // Import your client helper
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import UserButton from "../user-button";
+import { useWorkflowsParams } from "@/features/workflows/hooks/use-workflows-params";
+import { useEntitySearch } from "@/hooks/use-entity-search";
 
 type Props = {};
 
 const InfoBar = (props: Props) => {
-  //   const { credits, tier, setCredits, setTier } = useBilling();
   const router = useRouter();
-
-  // 1. Get the current session on the client side
   const { data: session } = authClient.useSession();
 
-  const onGetPayment = async () => {
-    // const response = await onPaymentDetails();
-    // if (response) {
-    //   setTier(response.tier!);
-    //   setCredits(response.credits!);
-    // }
-  };
-
-  const handleSignOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/sign-in"); // Redirect to sign-in page
-        },
-      },
-    });
-  };
-
-  useEffect(() => {
-    onGetPayment();
-  }, []);
+  const [params, setParams] = useWorkflowsParams();
+  const { searchValue, onSearchChange } = useEntitySearch({
+    params,
+    setParams,
+  });
 
   return (
     <div className="flex flex-row justify-end gap-6 items-center lg:px-24 md:px-16 px-8 py-4 w-full dark:bg-black/40 backdrop-blur-lg border-b border-neutral-800/50 z-10">
       <span className="flex items-center rounded-full bg-muted px-4 py-[0.5px]">
         <Search />
         <Input
-          pattern="search"
-          placeholder="Quick Search"
+          placeholder="Search Workflows"
           className="border-none bg-transparent rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
+          value={searchValue}
+          onChange={(e) => onSearchChange(e.target.value)}
         />
       </span>
       <TooltipProvider>
