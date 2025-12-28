@@ -22,6 +22,11 @@ import { motion } from "framer-motion";
 import UserButton from "../user-button";
 import { authClient } from "@/lib/auth-client";
 import { useHasActiveSubscription } from "@/features/subscriptions/hooks/use-subscription";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Props = {
   user?: {
@@ -30,6 +35,38 @@ type Props = {
     image?: string | null;
   } | null;
   children: React.ReactNode;
+};
+
+const SidebarTooltip = ({
+  children,
+  label,
+}: {
+  children: React.ReactNode;
+  label: string;
+}) => {
+  return (
+    <>
+      {/* Desktop: Tooltip */}
+      <div className="hidden lg:block">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="cursor-pointer">{children}</div>
+          </TooltipTrigger>
+          <TooltipContent
+            side="right"
+            className="bg-black text-white dark:bg-white dark:text-black border-none ml-2"
+          >
+            <p>{label}</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+      {/* Mobile: Row with text */}
+      <div className="flex lg:hidden items-center gap-2 cursor-pointer w-full">
+        {children}
+        <span className="text-neutral-800 dark:text-neutral-200">{label}</span>
+      </div>
+    </>
+  );
 };
 
 export default function SidebarShell({ user, children }: Props) {
@@ -74,7 +111,7 @@ export default function SidebarShell({ user, children }: Props) {
             </Link>
 
             {/* Links */}
-            <div className="mt-12 -ml-[2px] flex flex-col gap-6">
+            <div className="mt-12 -ml-[5px] flex flex-col gap-6">
               {links.map((link) => {
                 const isActive =
                   pathname === link.href ||
@@ -90,24 +127,21 @@ export default function SidebarShell({ user, children }: Props) {
               })}
             </div>
 
-            <Separator className="-ml-[4px] mt-5 dark:bg-neutral-700" />
+            <Separator className="-ml-[4px] mt-6 dark:bg-neutral-700" />
 
             {/* Horizontal Action rail */}
             <motion.div
-              animate={{
-                opacity: open ? 1 : 0,
-              }}
               transition={{
                 duration: 0.15,
                 ease: "easeInOut",
               }}
-              className="w-[54px] flex justify-center ml-25 -mt-15 rotate-90"
+              className="w-[54px] flex justify-center ml-25 -mt-15 rotate-90 lg:rotate-0 lg:-ml-4 lg:mt-5.5"
             >
               <ActionRail />
             </motion.div>
 
             {/* Vertical Action rail */}
-            <motion.div
+            {/* <motion.div
               animate={{
                 opacity: open ? 0 : 1,
               }}
@@ -118,7 +152,7 @@ export default function SidebarShell({ user, children }: Props) {
               className="w-[54px] flex justify-center -ml-4 -mt-35 rotate-0"
             >
               <ActionRail />
-            </motion.div>
+            </motion.div> */}
           </div>
 
           <div className="flex flex-col gap-4">
@@ -189,8 +223,9 @@ export default function SidebarShell({ user, children }: Props) {
 
             {/* User Button */}
             <div className="-ml-[5px] flex items-center gap-2">
-              {user ? <UserButton user={user} /> : null}
-              {open && (user ? <span>{user.name}</span> : null)}
+              <SidebarTooltip label={user?.name || "Profile"}>
+                {user ? <UserButton user={user} /> : null}
+              </SidebarTooltip>
             </div>
           </div>
         </SidebarBody>

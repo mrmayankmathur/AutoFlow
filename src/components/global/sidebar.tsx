@@ -3,6 +3,12 @@ import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Links {
   label: string;
@@ -46,7 +52,7 @@ export const SidebarProvider = ({
 
   return (
     <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
-      {children}
+      <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
     </SidebarContext.Provider>
   );
 };
@@ -83,24 +89,19 @@ export const DesktopSidebar = ({
   children,
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
-  const { open, setOpen, animate } = useSidebar();
+  // Removed setOpen triggers for desktop hover
   return (
-    <>
-      <motion.div
-        className={cn(
-          "h-screen px-4 py-4 ml-2 hidden lg:flex lg:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] shrink-0",
-          className
-        )}
-        animate={{
-          width: animate ? (open ? "300px" : "62px") : "300px",
-        }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    </>
+    <motion.div
+      className={cn(
+        "h-screen px-4 py-4 ml-2 hidden lg:flex lg:flex-col bg-neutral-100 dark:bg-neutral-800 shrink-0",
+        // Fixed width for desktop (collapsed state)
+        "w-[62px]",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </motion.div>
   );
 };
 
@@ -111,46 +112,44 @@ export const MobileSidebar = ({
 }: React.ComponentProps<"div">) => {
   const { open, setOpen } = useSidebar();
   return (
-    <>
-      <div
-        className={cn(
-          "h-10 sm:px-1 md:px-4 py-4 flex flex-row lg:hidden  items-center justify-between bg-neutral-100 dark:bg-neutral-800"
-        )}
-        {...props}
-      >
-        <div className="sm:w-4 sm:h-4 flex justify-end z-20">
-          <IconMenu2
-            className="text-neutral-800 dark:text-neutral-200"
-            onClick={() => setOpen(!open)}
-          />
-        </div>
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
-              className={cn(
-                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-100 flex flex-col justify-between",
-                className
-              )}
-            >
-              <div
-                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
-                onClick={() => setOpen(!open)}
-              >
-                <IconX />
-              </div>
-              {children}
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <div
+      className={cn(
+        "h-10 sm:px-1 md:px-4 py-4 flex flex-row lg:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800"
+      )}
+      {...props}
+    >
+      <div className="sm:w-4 sm:h-4 flex justify-end z-20">
+        <IconMenu2
+          className="text-neutral-800 dark:text-neutral-200"
+          onClick={() => setOpen(!open)}
+        />
       </div>
-    </>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ x: "-100%", opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: "-100%", opacity: 0 }}
+            transition={{
+              duration: 0.3,
+              ease: "easeInOut",
+            }}
+            className={cn(
+              "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-50 flex flex-col justify-between",
+              className
+            )}
+          >
+            <div
+              className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
+              onClick={() => setOpen(!open)}
+            >
+              <IconX />
+            </div>
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
@@ -164,31 +163,47 @@ export const SidebarLink = ({
   className?: string;
   isActive?: boolean;
 }) => {
-  const { open, animate } = useSidebar();
-  return (
+  // Common link content
+  const LinkContent = (
     <a
       href={link.href}
       className={cn(
-        "-ml-2 flex items-center gap-2 group/sidebar py-2 transition-all duration-150",
-        open ? "pl-2 hover:pl-0 justify-start" : "w-[44px] pl-0 justify-center",
+        "flex items-center gap-2 group/sidebar py-2 transition-all duration-150",
+        // Desktop: Center items. Mobile: Left align.
+        "lg:justify-center justify-start w-full lg:w-auto",
         isActive
-          ? "light:text-black! font-bold rounded-lg hover:pl-2 dark:text-white! lg:bg-transparent! dark:hover:bg-neutral-700! light:hover:bg-neutral-200! light:sm:bg-amber-50! dark:sm:bg-neutral-700!"
-          : "light:text-neutral-600/30 dark:text-neutral-600/60 light:hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg hover:pl-2 transition-all duration-150",
+          ? "light:text-black! font-bold rounded-lg hover:scale-105 dark:text-white! lg:bg-transparent! dark:hover:bg-neutral-700! light:hover:bg-neutral-200! light:sm:bg-amber-50! dark:sm:bg-neutral-700!"
+          : "light:text-neutral-600/30 dark:text-neutral-600/60 light:hover:bg-neutral-200 dark:hover:bg-neutral-700/50 rounded-lg hover:scale-105 transition-all duration-150",
         className
       )}
       {...props}
     >
       {link.icon}
 
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="text-neutral-700 dark:text-neutral-200 text-md group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! ml-5"
-      >
+      {/* Text label: Hidden on Desktop (lg:hidden), Visible on Mobile */}
+      <span className="text-neutral-700 dark:text-neutral-200 text-md whitespace-pre inline-block ml-2 lg:hidden">
         {link.label}
-      </motion.span>
+      </span>
     </a>
+  );
+
+  return (
+    <>
+      {/* Desktop View: Tooltip wrapped */}
+      <div className="hidden lg:block">
+        <Tooltip>
+          <TooltipTrigger asChild>{LinkContent}</TooltipTrigger>
+          <TooltipContent
+            side="right"
+            className="bg-black text-white dark:bg-white dark:text-black border-none ml-2"
+          >
+            <p>{link.label}</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+
+      {/* Mobile View: Raw link (text is visible via CSS above) */}
+      <div className="lg:hidden block">{LinkContent}</div>
+    </>
   );
 };

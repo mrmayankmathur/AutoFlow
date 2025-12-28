@@ -32,12 +32,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={font.className}>
         <TRPCReactProvider>
-          <ThemeProvider attribute="class">
-            <NuqsAdapter>
+          <NuqsAdapter>
+            <ThemeProvider attribute="class">
               {children}
               <Toaster className="z-100" />
-            </NuqsAdapter>
-          </ThemeProvider>
+            </ThemeProvider>
+          </NuqsAdapter>
         </TRPCReactProvider>
       </body>
     </html>

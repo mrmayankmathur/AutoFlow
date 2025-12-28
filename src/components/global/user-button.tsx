@@ -112,21 +112,6 @@ const UserButton = ({ user }: Props) => {
         <DropdownMenuSeparator className="mx-3 bg-neutral-800/70" />
 
         {/* Logout */}
-        <button
-          onClick={handleSettings}
-          className="
-            mx-3.5 my-2 rounded-lg cursor-pointer flex items-center gap-4.5 py-1 pr-38 pl-1.5
-            focus:bg-[#A4A4A4]/40 hover:bg-[#A4A4A4]/30
-            transition-all duration-200
-          "
-        >
-          <Settings className="h-4 w-4" />
-          <span className="font-medium text-[15px]">Settings</span>
-        </button>
-
-        <DropdownMenuSeparator className="mx-3 bg-neutral-800/70" />
-
-        {/* Logout */}
         <DropdownMenuItem
           onClick={handleSignOut}
           className="
