@@ -160,7 +160,11 @@ export default function SidebarShell({ user, children }: Props) {
             <div className="flex items-center gap-2">
               <SidebarActionButton
                 onClick={() => router.push("/settings")}
-                className="-ml-[5px] flex items-center gap-2 border border-neutral-200 dark:border-neutral-700 px-2"
+                className={cn(
+                  "-ml-[5px] flex items-center gap-2 border border-neutral-200 dark:border-neutral-700 px-2",
+                  pathname === "/settings" &&
+                    "bg-neutral-200 dark:bg-neutral-600"
+                )}
               >
                 <Settings className="h-4 w-4 shrink-0" />
               </SidebarActionButton>
@@ -231,10 +235,10 @@ export default function SidebarShell({ user, children }: Props) {
         </SidebarBody>
       </Sidebar>
 
-      <main className="flex">
+      <main className="flex flex-col flex-1 w-full">
         <div
           className={cn(
-            "h-full w-screen",
+            "h-full w-full",
             "rounded-tl-2xl",
             "border border-neutral-200 dark:border-neutral-700/50",
             "bg-white dark:bg-neutral-900",

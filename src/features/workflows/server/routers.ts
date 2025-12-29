@@ -8,15 +8,21 @@ import {
 import { z } from "zod";
 import { PAGINATION } from "@/config/constants";
 
+const createWorkflowSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+});
+
 export const workflowsRouter = createTRPCRouter({
-  create: premiumProcedure.mutation(({ ctx }) => {
-    return prisma.workflow.create({
-      data: {
-        name: generateSlug(3),
-        userId: ctx.auth.user.id,
-      },
-    });
-  }),
+  create: premiumProcedure
+    .input(createWorkflowSchema)
+    .mutation(({ ctx, input }) => {
+      return prisma.workflow.create({
+        data: {
+          name: input.name,
+          userId: ctx.auth.user.id,
+        },
+      });
+    }),
 
   remove: protectedProcedure
     .input(z.object({ id: z.string() }))

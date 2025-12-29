@@ -36,7 +36,7 @@ const InfoBar = (props: Props) => {
   });
 
   return (
-    <div className="flex flex-row justify-end gap-6 items-center lg:px-24 md:px-16 px-8 py-4 w-full dark:bg-black/40 backdrop-blur-lg border-b border-neutral-800/50 z-10">
+    <div className="flex flex-row justify-end gap-6 items-center px-8 py-4 w-full dark:bg-black/40 backdrop-blur-lg border-b border-neutral-800/50 z-10">
       <span className="flex items-center rounded-full bg-muted px-4 py-[0.5px]">
         <Search />
         <Input

@@ -5,6 +5,7 @@ import { TRPCReactProvider } from "@/trpc/client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import ModalProvider from "@/providers/modal-provider";
 
 // const sourceCodePro = Source_Code_Pro({
 //   variable: "--font-source-code-pro",
@@ -34,8 +35,10 @@ export default function RootLayout({
         <TRPCReactProvider>
           <NuqsAdapter>
             <ThemeProvider attribute="class">
-              {children}
-              <Toaster className="z-100" />
+              <ModalProvider>
+                {children}
+                <Toaster className="z-100" />
+              </ModalProvider>
             </ThemeProvider>
           </NuqsAdapter>
         </TRPCReactProvider>

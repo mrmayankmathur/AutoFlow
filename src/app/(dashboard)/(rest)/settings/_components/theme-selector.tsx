@@ -4,6 +4,7 @@ import * as React from "react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { Monitor, Moon, Sun } from "lucide-react";
+import Image from "next/image";
 
 export function ThemeSelector() {
   const { theme, setTheme } = useTheme();
@@ -25,20 +26,13 @@ export function ThemeSelector() {
       icon: Monitor,
       visual: (
         <div className="flex h-full w-full">
-          <div className="w-1/2 bg-[#F3F4F6] p-2">
-            <div className="h-2 w-8 rounded-lg bg-white" />
-            <div className="mt-2 space-y-1">
-              <div className="h-1 w-12 rounded-lg bg-white" />
-              <div className="h-1 w-10 rounded-lg bg-white" />
-            </div>
-          </div>
-          <div className="w-1/2 bg-[#1F2937] p-2">
-            <div className="h-2 w-8 rounded-lg bg-[#374151]" />
-            <div className="mt-2 space-y-1">
-              <div className="h-1 w-12 rounded-lg bg-[#374151]" />
-              <div className="h-1 w-10 rounded-lg bg-[#374151]" />
-            </div>
-          </div>
+          <Image
+            src="/system.png"
+            alt="System"
+            width={1000}
+            height={100}
+            className="rounded-lg"
+          />
         </div>
       ),
     },
@@ -47,14 +41,14 @@ export function ThemeSelector() {
       label: "Light",
       icon: Sun,
       visual: (
-        <div className="flex h-full w-full bg-[#F3F4F6] p-3">
-          <div className="w-full">
-            <div className="mx-auto h-2 w-8 rounded-lg bg-white" />
-            <div className="mt-3 space-y-1">
-              <div className="mx-auto h-1 w-12 rounded-lg bg-white" />
-              <div className="mx-auto h-1 w-10 rounded-lg bg-white" />
-            </div>
-          </div>
+        <div className="flex h-full w-full">
+          <Image
+            src="/light.png"
+            alt="Light"
+            width={1000}
+            height={100}
+            className="rounded-lg"
+          />
         </div>
       ),
     },
@@ -63,14 +57,14 @@ export function ThemeSelector() {
       label: "Dark",
       icon: Moon,
       visual: (
-        <div className="flex h-full w-full bg-[#1F2937] p-3">
-          <div className="w-full">
-            <div className="mx-auto h-2 w-8 rounded-lg bg-[#374151]" />
-            <div className="mt-3 space-y-1">
-              <div className="mx-auto h-1 w-12 rounded-lg bg-[#374151]" />
-              <div className="mx-auto h-1 w-10 rounded-lg bg-[#374151]" />
-            </div>
-          </div>
+        <div className="flex h-full w-full">
+          <Image
+            src="/dark.png"
+            alt="Dark"
+            width={1100}
+            height={100}
+            className="rounded-lg"
+          />
         </div>
       ),
     },
@@ -89,7 +83,7 @@ export function ThemeSelector() {
                   "flex lg:h-36 lg:w-72 md:h-64 md:w-lg h-42 w-84 cursor-pointer items-center justify-center rounded-lg border-2 border-transparent overflow-hidden transition-all hover:ring-2 hover:ring-neutral-400 hover:ring-offset-2 dark:hover:ring-neutral-600 dark:hover:ring-offset-neutral-900",
                   isActive
                     ? "ring-2 ring-neutral-950 ring-offset-2 dark:ring-neutral-200 dark:ring-offset-neutral-900"
-                    : "border-neutral-200 dark:border-neutral-800"
+                    : "border-neutral-200 bg-neutral-200 dark:bg-neutral-800 dark:border-neutral-800"
                 )}
               >
                 {item.visual}

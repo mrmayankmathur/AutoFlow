@@ -156,7 +156,7 @@ export const EntityPagination = ({
   disabled,
 }: EntityPaginationProps) => {
   return (
-    <div className="flex items-center justify-between md:px-8 md:-ml-6 sm:-ml-2 gap-x-2 w-full">
+    <div className="flex items-center justify-between w-full">
       <div className="flex-1 text-sm text-muted-foreground">
         Page {page} of {totalPages || 1}
       </div>

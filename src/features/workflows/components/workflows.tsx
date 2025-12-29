@@ -42,6 +42,7 @@ import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
 import { Workflow } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { EntityHeader, EntityPagination } from "@/components/entity-components";
+import WorkflowButton from "@/components/global/workflow-button";
 
 // --- Components ---
 
@@ -60,27 +61,10 @@ export const WorkflowsContainer = ({
 };
 
 export const WorkflowsHeader = ({ disabled }: { disabled?: boolean }) => {
-  const createWorkflow = useCreateWorkflow();
-  const { modal, handleError } = useUpgradeModal();
-  const router = useRouter();
-  const [params, setParams] = useWorkflowsParams();
-
-  // Debounce search to avoid spamming the URL/server
-  const debouncedSearch = useDebounceCallback((value: string) => {
-    setParams({ ...params, page: 1, search: value || undefined });
-  }, 500);
-
-  const handleCreate = () => {
-    createWorkflow.mutate(undefined, {
-      onSuccess: (data) => {
-        router.push(`/workflows/${data.id}`);
-      },
-      onError: handleError,
-    });
-  };
+  const { modal } = useUpgradeModal();
 
   return (
-    <div className="lg:ml-0 lg:mr-14 md:mr-8 mr-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       {modal}
       <div>
         <h2 className="text-3xl font-bold tracking-tight mt-5">Workflows</h2>
@@ -89,28 +73,7 @@ export const WorkflowsHeader = ({ disabled }: { disabled?: boolean }) => {
         </p>
       </div>
       <div className="flex items-center gap-2">
-        {/* <div className="relative w-full sm:w-[250px]">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search workflows..."
-            className="pl-9 bg-background"
-            defaultValue={params.search ?? ""}
-            onChange={(e) => debouncedSearch(e.target.value)}
-          />
-        </div> */}
-        <Button
-          onClick={handleCreate}
-          disabled={createWorkflow.isPending}
-          size="sm"
-          className="h-9"
-        >
-          {createWorkflow.isPending ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Plus className="mr-2 h-4 w-4" />
-          )}
-          New Workflow
-        </Button>
+        <WorkflowButton />
       </div>
     </div>
   );
@@ -124,7 +87,7 @@ export const WorkflowsList = () => {
   }
 
   return (
-    <div className="lg:ml-0 lg:mr-14 md:mr-8 mr-6 space-y-6">
+    <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {workflows.data.items.map((workflow) => (
           <WorkflowCard key={workflow.id} data={workflow} />
@@ -249,18 +212,7 @@ export const WorkflowsPagination = () => {
 };
 
 export const WorkflowsEmpty = () => {
-  const createWorkflow = useCreateWorkflow();
-  const { modal, handleError } = useUpgradeModal();
-  const router = useRouter();
-
-  const handleCreate = () => {
-    createWorkflow.mutate(undefined, {
-      onSuccess: (data) => {
-        router.push(`/workflows/${data.id}`);
-      },
-      onError: handleError,
-    });
-  };
+  const { modal } = useUpgradeModal();
 
   return (
     <>
@@ -274,10 +226,7 @@ export const WorkflowsEmpty = () => {
           You haven't created any workflows yet. Start automating your tasks by
           creating your first workflow.
         </p>
-        <Button onClick={handleCreate} disabled={createWorkflow.isPending}>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Workflow
-        </Button>
+        <WorkflowButton />
       </div>
     </>
   );
