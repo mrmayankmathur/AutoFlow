@@ -2,68 +2,231 @@
 
 import { formatDistanceToNow } from "date-fns";
 import {
-  EmptyView,
-  EmptyView2,
-  EntityContainer,
-  EntityHeader,
-  EntityItem,
-  EntityList,
-  EntityPagination,
-  ErrorView,
-  LoadingView,
-} from "@/components/entity-components";
+  Loader2,
+  MoreHorizontal,
+  Play,
+  Plus,
+  Search,
+  Trash2,
+  Workflow as WorkflowIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useDebounceCallback } from "usehooks-ts";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   useCreateWorkflow,
   useRemoveWorkflow,
   useSuspenseWorkflows,
 } from "../hooks/use-workflows";
-import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
-import { useRouter } from "next/navigation";
 import { useWorkflowsParams } from "../hooks/use-workflows-params";
+import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
 import { Workflow } from "@prisma/client";
-import { WorkflowIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { EntityHeader, EntityPagination } from "@/components/entity-components";
 
-export const WorkflowsList = () => {
-  const workflows = useSuspenseWorkflows();
+// --- Components ---
 
+export const WorkflowsContainer = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   return (
-    <EntityList
-      items={workflows.data.items}
-      getKey={(workflow) => workflow.id}
-      renderItem={(workflow) => <WorkflowItem data={workflow} />}
-      emptyView={<WorkflowsEmpty />}
-    />
+    <div className="flex flex-col h-full">
+      <div className="flex-1 space-y-8 p-8 pt-6 max-w-7xl mx-auto w-full">
+        {children}
+      </div>
+    </div>
   );
 };
 
 export const WorkflowsHeader = ({ disabled }: { disabled?: boolean }) => {
-  const router = useRouter();
   const createWorkflow = useCreateWorkflow();
   const { modal, handleError } = useUpgradeModal();
+  const router = useRouter();
+  const [params, setParams] = useWorkflowsParams();
+
+  // Debounce search to avoid spamming the URL/server
+  const debouncedSearch = useDebounceCallback((value: string) => {
+    setParams({ ...params, page: 1, search: value || undefined });
+  }, 500);
 
   const handleCreate = () => {
     createWorkflow.mutate(undefined, {
       onSuccess: (data) => {
         router.push(`/workflows/${data.id}`);
       },
-      onError: (error) => {
-        handleError(error);
-      },
+      onError: handleError,
     });
   };
 
   return (
-    <>
+    <div className="lg:ml-0 lg:mr-14 md:mr-8 mr-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       {modal}
-      <EntityHeader
-        title="Workflows"
-        description="Create and manage your workflows"
-        onNew={handleCreate}
-        newButtonLabel="Create Workflow"
-        disabled={disabled}
-        isCreating={createWorkflow.isPending}
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight mt-5">Workflows</h2>
+        <p className="text-muted-foreground mt-1">
+          Manage and automate your tasks efficiently.
+        </p>
+      </div>
+      <div className="flex items-center gap-2">
+        {/* <div className="relative w-full sm:w-[250px]">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search workflows..."
+            className="pl-9 bg-background"
+            defaultValue={params.search ?? ""}
+            onChange={(e) => debouncedSearch(e.target.value)}
+          />
+        </div> */}
+        <Button
+          onClick={handleCreate}
+          disabled={createWorkflow.isPending}
+          size="sm"
+          className="h-9"
+        >
+          {createWorkflow.isPending ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Plus className="mr-2 h-4 w-4" />
+          )}
+          New Workflow
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export const WorkflowsList = () => {
+  const workflows = useSuspenseWorkflows();
+
+  if (workflows.data.items.length === 0) {
+    return <WorkflowsEmpty />;
+  }
+
+  return (
+    <div className="lg:ml-0 lg:mr-14 md:mr-8 mr-6 space-y-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {workflows.data.items.map((workflow) => (
+          <WorkflowCard key={workflow.id} data={workflow} />
+        ))}
+      </div>
+      <WorkflowsPagination />
+    </div>
+  );
+};
+
+// Helper to generate a consistent gradient based on string length/char codes
+const getGradient = (id: string) => {
+  const gradients = [
+    "from-pink-500 via-red-500 to-yellow-500",
+    "from-blue-400 via-indigo-500 to-purple-500",
+    "from-green-400 via-emerald-500 to-teal-500",
+    "from-orange-400 via-amber-500 to-yellow-500",
+    "from-rose-400 via-fuchsia-500 to-indigo-500",
+  ];
+  const index = id.charCodeAt(0) % gradients.length;
+  return gradients[index];
+};
+
+export const WorkflowCard = ({ data }: { data: Workflow }) => {
+  const removeWorkflow = useRemoveWorkflow();
+  const router = useRouter();
+
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    removeWorkflow.mutate({ id: data.id });
+  };
+
+  const gradient = getGradient(data.id);
+
+  return (
+    <Card
+      className="group relative flex flex-col overflow-hidden border transition-all hover:shadow-md cursor-pointer hover:scale-[1.01] duration-150 mt-2"
+      onClick={() => router.push(`/workflows/${data.id}`)}
+    >
+      {/* Visual Header */}
+      <div
+        className={cn(
+          "h-24 w-full bg-linear-to-r dark:opacity-50 opacity-65 dark:group-hover:opacity-80 group-hover:opacity-100 transition-opacity",
+          gradient
+        )}
       />
-    </>
+
+      <CardHeader className="relative -mt-10 pb-2">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-background shadow-sm">
+          <WorkflowIcon className="h-6 w-6 text-muted-foreground" />
+        </div>
+        <CardTitle className="mt-4 truncate text-lg font-semibold leading-none tracking-tight">
+          {data.name}
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="flex-1 pb-2">
+        {/* Placeholder for description if you add it later to DB */}
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          Automated workflow created on{" "}
+          {new Date(data.createdAt).toLocaleDateString()}.
+        </p>
+      </CardContent>
+
+      <CardFooter className="flex items-center justify-between border-t bg-muted/20 px-6 py-3">
+        <div className="text-xs text-muted-foreground">
+          Edited {formatDistanceToNow(data.updatedAt)} ago
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 -mr-2 text-muted-foreground hover:text-foreground"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/workflows/${data.id}`);
+              }}
+            >
+              <Play className="mr-2 h-4 w-4" /> Open
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={handleRemove}
+              disabled={removeWorkflow.isPending}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </CardFooter>
+    </Card>
   );
 };
 
@@ -72,39 +235,17 @@ export const WorkflowsPagination = () => {
   const [params, setParams] = useWorkflowsParams();
 
   return (
-    <EntityPagination
-      disabled={workflows.isFetching}
-      totalPages={workflows.data.totalPages}
-      page={workflows.data.page}
-      onPageChange={(page) => {
-        setParams({ ...params, page });
-      }}
-    />
+    <div className="mt-8">
+      <EntityPagination
+        disabled={workflows.isFetching}
+        totalPages={workflows.data.totalPages}
+        page={workflows.data.page}
+        onPageChange={(page) => {
+          setParams({ ...params, page });
+        }}
+      />
+    </div>
   );
-};
-
-export const WorkflowsContainer = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  return (
-    <EntityContainer
-      header={<WorkflowsHeader />}
-      search={<></>}
-      pagination={<WorkflowsPagination />}
-    >
-      {children}
-    </EntityContainer>
-  );
-};
-
-export const WorkflowsLoading = () => {
-  return <LoadingView message="Loading workflows..." />;
-};
-
-export const WorkflowsError = () => {
-  return <ErrorView message="Error loading workflows" />;
 };
 
 export const WorkflowsEmpty = () => {
@@ -117,49 +258,73 @@ export const WorkflowsEmpty = () => {
       onSuccess: (data) => {
         router.push(`/workflows/${data.id}`);
       },
-      onError: (error) => {
-        handleError(error);
-      },
+      onError: handleError,
     });
   };
 
   return (
     <>
       {modal}
-      <EmptyView2
-        message="You haven't created any workflows yet. Get started by creating your first workflow."
-        onNew={handleCreate}
-      />
+      <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed bg-background p-8 text-center animate-in fade-in-50">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+          <WorkflowIcon className="h-10 w-10 text-muted-foreground" />
+        </div>
+        <h3 className="mt-4 text-lg font-semibold">No workflows created</h3>
+        <p className="mb-4 mt-2 text-sm text-muted-foreground max-w-sm">
+          You haven't created any workflows yet. Start automating your tasks by
+          creating your first workflow.
+        </p>
+        <Button onClick={handleCreate} disabled={createWorkflow.isPending}>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Workflow
+        </Button>
+      </div>
     </>
   );
 };
 
-export const WorkflowItem = ({ data }: { data: Workflow }) => {
-  const removeWorkflow = useRemoveWorkflow();
-
-  const handleRemove = () => {
-    removeWorkflow.mutate({ id: data.id });
-  };
-
+export const WorkflowsLoading = () => {
   return (
-    <EntityItem
-      key={data.id}
-      href={`/workflows/${data.id}`}
-      title={data.name}
-      subtitle={
-        <>
-          Updated {formatDistanceToNow(data.updatedAt, { addSuffix: true })}{" "}
-          &bull; Created{" "}
-          {formatDistanceToNow(data.createdAt, { addSuffix: true })}
-        </>
-      }
-      image={
-        <div className="size-8 flex items-center justify-center">
-          <WorkflowIcon className="size-5 text-muted-foreground" />
+    <div className="space-y-6 p-1">
+      <div className="flex justify-between items-center">
+        <Skeleton className="h-9 w-48" />
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-64" />
+          <Skeleton className="h-9 w-24" />
         </div>
-      }
-      onRemove={handleRemove}
-      isRemoving={removeWorkflow.isPending}
-    />
+      </div>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="flex flex-col rounded-xl border bg-card text-card-foreground shadow-sm h-[200px]"
+          >
+            <div className="h-24 w-full bg-muted rounded-t-xl" />
+            <div className="p-6 pt-0 space-y-2">
+              <Skeleton className="h-12 w-12 rounded-xl -mt-6 mb-4 border bg-card" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-3 w-1/2" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export const WorkflowsError = () => {
+  return (
+    <div className="flex h-[50vh] flex-col items-center justify-center gap-4 text-center">
+      <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/20">
+        <WorkflowIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
+      </div>
+      <h3 className="text-lg font-semibold">Something went wrong</h3>
+      <p className="text-muted-foreground">
+        We couldn't load your workflows. Please try again later.
+      </p>
+      <Button variant="outline" onClick={() => window.location.reload()}>
+        Reload Page
+      </Button>
+    </div>
   );
 };
