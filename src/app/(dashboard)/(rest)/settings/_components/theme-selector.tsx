@@ -80,7 +80,7 @@ export function ThemeSelector() {
               <button
                 onClick={() => setTheme(item.id)}
                 className={cn(
-                  "flex lg:h-36 lg:w-72 md:h-64 md:w-lg h-42 w-84 cursor-pointer items-center justify-center rounded-lg border-2 border-transparent overflow-hidden transition-all hover:ring-2 hover:ring-neutral-400 hover:ring-offset-2 dark:hover:ring-neutral-600 dark:hover:ring-offset-neutral-900",
+                  "flex lg:h-36 lg:w-72 md:h-36 md:w-72 h-38 w-74 cursor-pointer items-center justify-center rounded-lg border-2 border-transparent overflow-hidden transition-all hover:ring-2 hover:ring-neutral-400 hover:ring-offset-2 dark:hover:ring-neutral-600 dark:hover:ring-offset-neutral-900",
                   isActive
                     ? "ring-2 ring-neutral-950 ring-offset-2 dark:ring-neutral-200 dark:ring-offset-neutral-900"
                     : "border-neutral-200 bg-neutral-200 dark:bg-neutral-800 dark:border-neutral-800"
