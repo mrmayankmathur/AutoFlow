@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+
+import React, { useState } from "react";
 import { FileUpload } from "@/components/global/file-upload";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -16,6 +17,7 @@ type Props = {
 
 const ProfilePicture = ({ userImage, onDelete, onUpload }: Props) => {
   const router = useRouter();
+  const [isRemoving, setIsRemoving] = useState(false);
 
   // 1. Setup UploadThing Hook
   const { startUpload, isUploading } = useUploadThing("profileImage", {
@@ -32,9 +34,18 @@ const ProfilePicture = ({ userImage, onDelete, onUpload }: Props) => {
   });
 
   const onRemoveProfileImage = async () => {
-    const response = await onDelete();
-    if (response) {
-      router.refresh();
+    try {
+      setIsRemoving(true);
+      const response = await onDelete();
+      if (response) {
+        router.refresh();
+        toast.success("Profile picture removed successfully");
+      }
+    } catch (error) {
+      console.error("Failed to remove image", error);
+      toast.error("Failed to remove image");
+    } finally {
+      setIsRemoving(false);
     }
   };
 
@@ -67,7 +78,17 @@ const ProfilePicture = ({ userImage, onDelete, onUpload }: Props) => {
               variant="destructive"
               className="bg-red-100 text-red-600 hover:bg-red-200 border border-red-200 dark:bg-red-500/10 dark:text-red-500 dark:hover:bg-red-500/20 dark:border-red-500/50"
             >
-              <X className="mr-2 h-4 w-4" /> Remove Picture
+              {isRemoving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <span>Removing...</span>
+                </>
+              ) : (
+                <>
+                  <X className="mr-2 h-4 w-4" />
+                  <span>Remove Picture</span>
+                </>
+              )}
             </Button>
           </div>
         ) : (
