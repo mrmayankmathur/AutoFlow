@@ -80,11 +80,12 @@ export const SettingsClient = ({
           {/* --- Sidebar Navigation --- */}
           <nav className="w-full md:w-64 shrink-0 space-y-2">
             {sidebarItems.map((item) => (
-              <div
+              <button
+                type="button"
                 key={item.id}
                 onClick={() => setActiveTab(item.id as Tab)}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer",
+                  "flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer w-full text-left",
                   activeTab === item.id
                     ? "bg-white dark:bg-[#1f212b] shadow-sm border border-neutral-200/50 dark:border-neutral-800"
                     : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
@@ -95,7 +96,7 @@ export const SettingsClient = ({
                     "h-5 w-5",
                     activeTab === item.id
                       ? "text-neutral-900 dark:text-white"
-                      : "currentColor"
+                      : ""
                   )}
                 />
                 <span
@@ -103,12 +104,12 @@ export const SettingsClient = ({
                     "font-medium",
                     activeTab === item.id
                       ? "text-neutral-900 dark:text-white"
-                      : "currentColor"
+                      : ""
                   )}
                 >
                   {item.label}
                 </span>
-              </div>
+              </button>
             ))}
           </nav>
 

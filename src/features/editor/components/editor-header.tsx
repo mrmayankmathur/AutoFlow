@@ -74,7 +74,13 @@ export const EditorNameInput = ({ workflowId }: Props) => {
   }, [isEditing]);
 
   const handleSave = async () => {
-    if (name === workflow.name) {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setName(workflow.name);
+      setIsEditing(false);
+      return;
+    }
+    if (trimmedName === workflow.name) {
       setIsEditing(false);
       return;
     }
@@ -82,9 +88,11 @@ export const EditorNameInput = ({ workflowId }: Props) => {
     try {
       await updateWorkflowName.mutateAsync({
         id: workflowId,
-        name,
+        name: trimmedName,
       });
     } catch (error) {
+      // TODO: Show toast/alert with error message
+      console.error("Failed to update workflow name:", error);
       setName(workflow.name);
     } finally {
       setIsEditing(false);

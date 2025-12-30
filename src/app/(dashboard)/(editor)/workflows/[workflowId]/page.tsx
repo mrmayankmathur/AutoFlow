@@ -1,4 +1,3 @@
-import InfoBar from "@/components/global/infobar";
 import {
   Editor,
   EditorError,
