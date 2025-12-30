@@ -22,12 +22,12 @@ export default async function DashboardLayout({
 
   const user = session?.user;
   return (
-    <SidebarShell user={user}>
+    <>
       <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
-      {/* <div className="w-full sticky top-0 z-10">
+      <div className="w-full sticky top-0 z-10">
         <InfoBar />
-      </div> */}
+      </div>
       <div className="w-full overflow-y-clip">{children}</div>
-    </SidebarShell>
+    </>
   );
 }
