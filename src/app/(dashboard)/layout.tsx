@@ -24,10 +24,7 @@ export default async function DashboardLayout({
   return (
     <SidebarShell user={user}>
       <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
-      {/* <div className="w-full sticky top-0 z-10">
-        <InfoBar />
-      </div> */}
-      <div className="w-full overflow-y-clip">{children}</div>
+      <div className="w-full h-full flex flex-col">{children}</div>
     </SidebarShell>
   );
 }
