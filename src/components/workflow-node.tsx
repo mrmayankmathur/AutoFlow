@@ -51,7 +51,7 @@ export const WorkflowNode = ({
           isVisible
           className="max-w-[200px] text-center"
         >
-          <p className="font-medium">{name}</p>
+          <p className="font-medium dark:text-white">{name}</p>
           {description && (
             <p className="text-muted-foreground truncate text-xs">
               {description}
