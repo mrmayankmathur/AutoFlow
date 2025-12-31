@@ -57,7 +57,7 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
   );
 
   return (
-    <div className="size-full dark:text-black!">
+    <div className="size-full dark:text-black! light:bg-[#FBFBFB]">
       <ReactFlow
         colorMode={(theme as ColorMode) || "system"}
         nodes={nodes}
