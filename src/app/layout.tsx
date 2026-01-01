@@ -1,21 +1,13 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
-import "./globals.css";
 import { TRPCReactProvider } from "@/trpc/client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import ModalProvider from "@/providers/modal-provider";
+import { Provider } from "jotai";
 
-// const sourceCodePro = Source_Code_Pro({
-//   variable: "--font-source-code-pro",
-//   subsets: ["latin"],
-// });
-
-// const roboto = Roboto({
-//   variable: "--font-roboto",
-//   subsets: ["latin"],
-// });
+import "./globals.css";
 
 const font = DM_Sans({ subsets: ["latin"] });
 
@@ -36,8 +28,10 @@ export default function RootLayout({
           <NuqsAdapter>
             <ThemeProvider attribute="class">
               <ModalProvider>
-                {children}
-                <Toaster className="z-100" />
+                <Provider>
+                  {children}
+                  <Toaster className="z-100" />
+                </Provider>
               </ModalProvider>
             </ThemeProvider>
           </NuqsAdapter>
