@@ -64,6 +64,11 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
   // Refs for tracking drag state
   const overlappedEdgeRef = useRef<string | null>(null);
   const closestNodeRef = useRef<string | null>(null);
+  const lastMoveTimeRef = useRef<number>(0);
+
+  const onMove = useCallback(() => {
+    lastMoveTimeRef.current = Date.now();
+  }, []);
 
   // Standard Handlers
   const onNodesChange = useCallback(
@@ -112,6 +117,27 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
     },
     [store]
   );
+
+  const { setCenter } = useReactFlow();
+
+  const onNodeClick = (event: React.MouseEvent, node: Node) => {
+    if (Date.now() - lastMoveTimeRef.current < 200) {
+      return;
+    }
+
+    // 1. Calculate center
+    const width = node.measured?.width ?? node.width ?? 0;
+    const height = node.measured?.height ?? node.height ?? 0;
+
+    // 2. Move camera
+    setCenter(node.position.x + width / 2, node.position.y + height / 2, {
+      zoom: 1.2,
+      duration: 800,
+    });
+  };
+
+  const maskColor =
+    theme === "dark" ? "rgba(0, 0, 0, 0.7)" : "rgba(240, 240, 240, 0.6)";
 
   // --- Logic: Drag Handler (Intersection + Proximity) ---
   const onNodeDrag: OnNodeDrag = useCallback(
@@ -273,9 +299,25 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         proOptions={{ hideAttribution: true }}
         panActivationKeyCode="Space"
         selectionMode={SelectionMode.Partial}
+        onMove={onMove}
       >
         <Controls />
-        <MiniMap position="top-left" />
+        <MiniMap
+          position="top-left"
+          pannable={true}
+          zoomable={true}
+          onNodeClick={onNodeClick}
+          nodeColor={(node) => {
+            if (node.data.hasError) return "#ff0000";
+            if (node.selected) return "#9faaf4";
+            return "#B1B1B7";
+          }}
+          maskColor={maskColor}
+          style={{
+            height: 120,
+            backgroundColor: theme === "dark" ? "#1a1a1a" : "#fff",
+          }}
+        />
         <Background />
         <NavigationControls />
         <Panel position="top-right">

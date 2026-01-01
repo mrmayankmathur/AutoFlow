@@ -48,7 +48,7 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
     setDialogOpen(true);
   };
 
-  const nodeStatus = "success";
+  const nodeStatus = "loading";
 
   return (
     <>
