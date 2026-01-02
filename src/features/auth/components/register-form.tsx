@@ -131,7 +131,7 @@ export function RegisterForm() {
 
             <div className="relative z-10 h-full p-10 text-white">
               <p className="text-xs uppercase tracking-widest opacity-80">
-                Kriya Labs
+                AutoFlow
               </p>
 
               <div className="absolute bottom-10 left-10 max-w-sm">

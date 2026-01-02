@@ -131,7 +131,7 @@ export function LoginForm() {
 
             <div className="relative z-10 h-full p-10 text-white">
               <p className="text-xs uppercase tracking-widest opacity-80">
-                Kriya Labs
+                AutoFlow
               </p>
 
               <div className="absolute bottom-10 left-10 max-w-sm">
@@ -156,7 +156,7 @@ export function LoginForm() {
               </Link>
               <Link href="/">
                 <span className="text-[21.5px] font-semibold cursor-pointer opacity-60 text-[#2A1E67]">
-                  KriyaLabs
+                  AutoFlow
                 </span>
               </Link>
             </div>

@@ -56,7 +56,7 @@ export const auth = betterAuth({
           products: [
             {
               productId: "511a0ae2-8fa8-4b7f-9963-e663d19cda6b",
-              slug: "KriyaLabs-Pro",
+              slug: "AutoFlow-Pro",
             },
           ],
           successUrl: process.env.POLAR_SUCCESS_URL,

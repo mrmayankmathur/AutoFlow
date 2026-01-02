@@ -14,7 +14,7 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
-interface KriyaLabsVerifyEmailProps {
+interface AutoFlowVerifyEmailProps {
   username?: string;
   userImage?: string;
   invitedByUsername?: string;
@@ -30,12 +30,12 @@ const baseUrl = process.env.NEXT_PUBLIC_APP_URL
 
 export const VerifyEmailTemplate = ({
   username = "there",
-  inviteLink = "https://kriyalabs.com",
-}: KriyaLabsVerifyEmailProps) => {
+  inviteLink = "https://autoflow.com",
+}: AutoFlowVerifyEmailProps) => {
   return (
     <Html>
       <Head />
-      <Preview>Verify your email for KriyaLabs</Preview>
+      <Preview>Verify your email for AutoFlow</Preview>
       <Tailwind>
         <Body className="bg-white my-auto mx-auto font-sans px-2">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
@@ -45,7 +45,7 @@ export const VerifyEmailTemplate = ({
                   src={`https://vj55q2qwf4.ufs.sh/f/P1J5jomm6ex095Xplt2wKzUBD7erEQ520Z8nlopAPIMf6kmu`}
                   width="80"
                   height="80"
-                  alt="KriyaLabs"
+                  alt="AutoFlow"
                   className="my-0 mx-auto"
                 />
               </div>
@@ -57,7 +57,7 @@ export const VerifyEmailTemplate = ({
               Hello {username},
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
-              Welcome to <strong>KriyaLabs</strong>! To start automating your
+              Welcome to <strong>AutoFlow</strong>! To start automating your
               workflows, please verify your email address by clicking the button
               below.
             </Text>

@@ -1,5 +1,4 @@
-# 🚀 KriyaLabs — AI-Native SaaS for Intelligent Workflows
-
+# 🚀 AutoFlow — AI-Native SaaS for Intelligent Workflows
 
 <img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/77d1d7f8-19da-4485-8f3d-93d54fee0d0f" />
 
@@ -13,36 +12,36 @@
 
 ## 📋 Table of Contents
 
-- 🤖 Introduction  
-- 🧠 Philosophy & Architecture  
-- ⚙️ Tech Stack  
-- 🔋 Core Features  
-- 🧩 System Design Highlights  
-- 🤸 Quick Start  
-- 🧪 Environment Setup  
-- 🕸️ License  
-- 🔗 Contact  
-- 🚀 Acknowledgements  
+- 🤖 Introduction
+- 🧠 Philosophy & Architecture
+- ⚙️ Tech Stack
+- 🔋 Core Features
+- 🧩 System Design Highlights
+- 🤸 Quick Start
+- 🧪 Environment Setup
+- 🕸️ License
+- 🔗 Contact
+- 🚀 Acknowledgements
 
 ---
 
 ## 🤖 Introduction
 
-**KriyaLabs** is a production-grade, event-driven SaaS platform designed to democratize workflow automation. Built to rival industry giants like Zapier and N8N, it empowers users to design complex, multi-step automations using a visual drag-and-drop canvas.
+**AutoFlow** is a production-grade, event-driven SaaS platform designed to democratize workflow automation. Built to rival industry giants like Zapier and N8N, it empowers users to design complex, multi-step automations using a visual drag-and-drop canvas.
 
 Unlike traditional tools, it combines **reliability** with **aesthetics**. Under the hood, it runs on a high-performance execution engine powered by **Inngest**, ensuring 100% reliable background job processing, retries, & flow control. The user experience is elevated by a cutting-edge interface inspired by **Aceternity UI**, featuring parallax effects, 3D visualizations, and glassmorphism that makes automation feel magical.
 
-Whether you are chaining AI agents (OpenAI, Gemini), listening for Webhooks, or managing subscriptions via Polar, KriyaLabs offers a seamless, type-safe, and visually immersive environment for modern developers and creators.
+Whether you are chaining AI agents (OpenAI, Gemini), listening for Webhooks, or managing subscriptions via Polar, AutoFlow offers a seamless, type-safe, and visually immersive environment for modern developers and creators.
 
 ---
 
 ## 🧠 Philosophy & Architecture
 
-KriyaLabs is built around three core principles:
+AutoFlow is built around three core principles:
 
-- **Separation of Concerns** — UI, business logic, and background workflows are clearly isolated  
-- **Event-Driven Design** — async workflows using Inngest instead of cron-based hacks  
-- **Production-First Thinking** — patterns that scale, are observable, and are easy to debug  
+- **Separation of Concerns** — UI, business logic, and background workflows are clearly isolated
+- **Event-Driven Design** — async workflows using Inngest instead of cron-based hacks
+- **Production-First Thinking** — patterns that scale, are observable, and are easy to debug
 
 Every architectural decision is intentional and explainable.
 
@@ -51,6 +50,7 @@ Every architectural decision is intentional and explainable.
 ## ⚙️ Tech Stack
 
 ### Frontend
+
 - Next.js (App Router)
 - TypeScript
 - Tailwind CSS
@@ -58,11 +58,13 @@ Every architectural decision is intentional and explainable.
 - Aceternity UI
 
 ### Backend & Infrastructure
+
 - PostgreSQL (Neon)
 - Inngest
 - Better Auth
 
 ### AI & Tooling
+
 - OpenAI APIs
 - Modular AI service layers
 - Typed, reusable inference logic
@@ -71,24 +73,24 @@ Every architectural decision is intentional and explainable.
 
 ## 🔋 Core Features
 
-- **Production-Grade Authentication** using Better Auth  
-- **Event-Driven Background Jobs** with Inngest  
-- **Clean Backend Architecture** using PostgreSQL  
-- **Modern Landing Page**  
-- **Scalable Data Models** designed for real growth  
-- **AI-First System Design** (not bolted-on APIs)  
-- **Reusable, Typed Codebase** for long-term maintainability  
-- **Fully Responsive UI** across all screen sizes  
+- **Production-Grade Authentication** using Better Auth
+- **Event-Driven Background Jobs** with Inngest
+- **Clean Backend Architecture** using PostgreSQL
+- **Modern Landing Page**
+- **Scalable Data Models** designed for real growth
+- **AI-First System Design** (not bolted-on APIs)
+- **Reusable, Typed Codebase** for long-term maintainability
+- **Fully Responsive UI** across all screen sizes
 
 ---
 
 ## 🧩 System Design Highlights
 
-- Async-first architecture for heavy operations  
-- End-to-end type safety  
-- Reusable UI and backend utilities  
-- Observable background workflows  
-- Senior-level code readability and structure  
+- Async-first architecture for heavy operations
+- End-to-end type safety
+- Reusable UI and backend utilities
+- Observable background workflows
+- Senior-level code readability and structure
 
 ---
 
@@ -96,17 +98,17 @@ Every architectural decision is intentional and explainable.
 
 ### Prerequisites
 
-- Git  
-- Node.js (18+)  
-- npm / pnpm / yarn  
+- Git
+- Node.js (18+)
+- npm / pnpm / yarn
 
 ---
 
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/mrmayankmathur/kriyalabs.git
-cd kriyalabs
+git clone https://github.com/mrmayankmathur/autoflow.git
+cd autoflow
 ```
 
 ---
@@ -129,7 +131,7 @@ DATABASE_URL=
 
 # Better Auth
 BETTER_AUTH_SECRET=
-BETTER_AUTH_URL=http://localhost:3000 
+BETTER_AUTH_URL=http://localhost:3000
 
 # Google Auth
 GOOGLE_CLIENT_ID=
@@ -162,21 +164,21 @@ See the `LICENSE` file for more information.
 
 ## 🔗 Contact
 
-* **Name:** Mayank Mathur
-* **Email:** [mrmayankmathur@gmail.com](mailto:mrmayankmathur@gmail.com)
-* **Repository:** [https://github.com/mrmayankmathur/kriyalabs](https://github.com/mrmayankmathur/kriyalabs)
+- **Name:** Mayank Mathur
+- **Email:** [mrmayankmathur@gmail.com](mailto:mrmayankmathur@gmail.com)
+- **Repository:** [https://github.com/mrmayankmathur/autoflow](https://github.com/mrmayankmathur/AutoFlow)
 
 ---
 
 ## 🚀 Acknowledgements
 
-* Next.js
-* Convex
-* Inngest
-* Clerk
-* OpenAI
-* ShadCN UI
-* Aceternity UI
+- Next.js
+- Convex
+- Inngest
+- Clerk
+- OpenAI
+- ShadCN UI
+- Aceternity UI
 
 ---
 

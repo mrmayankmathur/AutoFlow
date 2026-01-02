@@ -101,17 +101,15 @@ export default function SidebarShell({ user, children }: Props) {
         <SidebarBody className="justify-between">
           <div className="flex flex-col">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 mt-1">
-              <Image src="/logo.png" alt="Logo" width={25} height={25} />
-              {open && (
-                <span className="text-neutral-800 dark:text-neutral-200">
-                  KriyaLabs
-                </span>
-              )}
+            <Link
+              href="/"
+              className="flex items-center gap-2 mt-1 lg:-ml-[3px] md:ml-10 ml-5 scale-115"
+            >
+              <Image src="/logo.png" alt="Logo" width={30} height={40} />
             </Link>
 
             {/* Links */}
-            <div className="mt-12 -ml-[5px] flex flex-col gap-6">
+            <div className="mt-10 -ml-[5px] flex flex-col gap-6">
               {links.map((link) => {
                 const isActive =
                   pathname === link.href ||
@@ -168,39 +166,17 @@ export default function SidebarShell({ user, children }: Props) {
               >
                 <Settings className="h-4 w-4 shrink-0" />
               </SidebarActionButton>
-
-              {open && (
-                <span
-                  className={cn(
-                    "text-neutral-800 dark:text-neutral-200 transition-opacity duration-300 ease-in-out",
-                    open ? "opacity-100" : "opacity-0"
-                  )}
-                >
-                  Settings
-                </span>
-              )}
             </div>
 
             {/* Upgrade to Pro */}
             {!hasActiveSubscription && !isLoading && (
               <div className="flex items-center gap-2">
                 <SidebarActionButton
-                  onClick={() => authClient.checkout({ slug: "KriyaLabs-Pro" })}
+                  onClick={() => authClient.checkout({ slug: "AutoFlow-Pro" })}
                   className="-ml-[5px] flex items-center gap-2 border border-neutral-200 dark:border-neutral-700 px-2"
                 >
                   <Sparkles className="h-4 w-4 shrink-0" />
                 </SidebarActionButton>
-
-                {open && (
-                  <span
-                    className={cn(
-                      "text-neutral-800 dark:text-neutral-200 transition-opacity duration-300 ease-in-out",
-                      open ? "opacity-100" : "opacity-0"
-                    )}
-                  >
-                    Upgrade to Pro
-                  </span>
-                )}
               </div>
             )}
 
@@ -212,17 +188,6 @@ export default function SidebarShell({ user, children }: Props) {
               >
                 <CreditCardIcon className="h-4 w-4 shrink-0" />
               </SidebarActionButton>
-
-              {open && (
-                <span
-                  className={cn(
-                    "text-neutral-800 dark:text-neutral-200 transition-opacity duration-300 ease-in-out",
-                    open ? "opacity-100" : "opacity-0"
-                  )}
-                >
-                  Billing Portal
-                </span>
-              )}
             </div>
 
             {/* User Button */}

@@ -12,7 +12,7 @@ import "./globals.css";
 const font = DM_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "KriyaLabs: AI Workflow Automation Platform",
+  title: "AutoFlow: AI Workflow Automation Platform",
   description: "AI Workflow Automation Platform & Tools",
 };
 

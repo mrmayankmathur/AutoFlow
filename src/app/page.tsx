@@ -33,7 +33,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <h1 className="text-5xl md:text-8xl  bg-clip-text text-transparent bg-linear-to-b from-white to-neutral-600 font-sans font-bold">
-                  Automate Your Work With KriyaLabs
+                  Automate Your Work With AutoFlow
                 </h1>
               </div>
             }

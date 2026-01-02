@@ -30,7 +30,7 @@ export const UpgradeModal = ({ open, onOpenChange }: UpgradeModalProps) => {
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => authClient.checkout({ slug: "KriyaLabs-Pro" })}
+            onClick={() => authClient.checkout({ slug: "AutoFlow-Pro" })}
           >
             Upgrade
           </AlertDialogAction>

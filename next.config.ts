@@ -45,7 +45,7 @@ export default withSentryConfig(nextConfig, {
 
   org: "mayank-mathur",
 
-  project: "kriyalabs",
+  project: "autoflow",
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
