@@ -31,6 +31,7 @@ export const WorkflowNode = ({
             variant="ghost"
             onClick={onSettings}
             className="text-muted-foreground dark:hover:text-white"
+            aria-label="Settings"
           >
             <SettingsIcon className="size-4" />
           </Button>
@@ -39,6 +40,7 @@ export const WorkflowNode = ({
             variant="ghost"
             onClick={onDelete}
             className="text-muted-foreground dark:hover:text-white"
+            aria-label="Delete"
           >
             <TrashIcon className="size-4" />
           </Button>
