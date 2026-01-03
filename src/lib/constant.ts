@@ -8,7 +8,7 @@ import Workflows from "@/components/icons/workflows";
 import { Connection } from "./types";
 
 export const clients = [...new Array(10)].map((client, index) => ({
-  href: `/${index + 1}.png`,
+  href: `/${index}.png`,
 }));
 
 export const menuOptions = [
