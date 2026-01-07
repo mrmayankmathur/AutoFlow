@@ -1,6 +1,6 @@
 # 🚀 AutoFlow — AI-Native SaaS for Intelligent Workflows
 
-<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/77d1d7f8-19da-4485-8f3d-93d54fee0d0f" />
+<img width="3168" height="1344" alt="banner" src="https://github.com/user-attachments/assets/7f4a7702-93a7-46a4-ac7b-5d0fee82e24e" />
 
 <div align="center">
 
