@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "inngest:dev": "inngest-cli dev"
+    "inngest:dev": "inngest-cli dev",
+    "ngrok:dev": "ngrok http --url=bridgeable-subcreatively-ashly.ngrok-free.dev 3000"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.56",
