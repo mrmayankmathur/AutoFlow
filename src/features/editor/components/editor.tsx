@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useMemo } from "react";
+import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import { ErrorView, LoadingView } from "@/components/entity-components";
 import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
 import {
@@ -25,6 +25,7 @@ import {
   type DefaultEdgeOptions,
   SelectionMode,
 } from "@xyflow/react";
+import { Undo, Redo } from "lucide-react";
 
 import "@xyflow/react/dist/style.css";
 import { nodeComponents } from "@/config/node-components";
@@ -35,75 +36,126 @@ import { editorAtom } from "../store/atoms";
 import { NavigationControls } from "./navigation-control";
 import { NodeType } from "@prisma/client";
 import { ExecuteWorkflowButton } from "./execute-workflow-button";
+import { useUndoRedo } from "@/hooks/use-undo-redo";
+import { Button } from "@/components/ui/button";
 
-// --- Configuration ---
-const MIN_DISTANCE = 150; // Distance to trigger auto-connect
+const MIN_DISTANCE = 150;
 const defaultEdgeOptions: DefaultEdgeOptions = {
   interactionWidth: 75,
 };
 
-export const EditorLoading = () => {
-  return <LoadingView message="Loading Editor..." />;
-};
+export const EditorLoading = () => <LoadingView message="Loading Editor..." />;
+export const EditorError = () => <ErrorView message="Error loading editor" />;
 
-export const EditorError = () => {
-  return <ErrorView message="Error loading editor" />;
-};
-
-// --- Internal Canvas Component ---
 const EditorCanvas = ({ workflow }: { workflow: any }) => {
   const { theme } = useTheme();
   const setEditor = useSetAtom(editorAtom);
 
-  // Flow State
-  const [nodes, setNodes] = useState<Node[]>(workflow.nodes);
-  const [edges, setEdges] = useState<Edge[]>(workflow.edges);
+  // --- Hook Integration ---
+  const {
+    nodes,
+    setNodes,
+    edges,
+    setEdges,
+    undo,
+    redo,
+    takeSnapshot,
+    canUndo,
+    canRedo,
+  } = useUndoRedo(workflow.nodes, workflow.edges);
 
   const { updateEdge, getEdge, addEdges } = useReactFlow();
   const store = useStoreApi();
 
-  // Refs for tracking drag state
+  // Refs
   const overlappedEdgeRef = useRef<string | null>(null);
   const closestNodeRef = useRef<string | null>(null);
   const lastMoveTimeRef = useRef<number>(0);
 
+  // --- Keyboard Shortcuts ---
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        if (event.key === "z") {
+          event.preventDefault();
+          if (event.shiftKey) redo();
+          else undo();
+        } else if (event.key === "y") {
+          event.preventDefault();
+          redo();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [undo, redo]);
+
+  // --- 1. FIXED: onNodesChange (Blocks Position Snapshots) ---
+  const onNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      // Filter out changes that should NOT trigger a snapshot
+      // We ignore 'position' here because onNodeDragStart handles the "Move" snapshot
+      const isStructureChange = changes.some(
+        (c) => c.type === "remove" || c.type === "add"
+      );
+
+      if (isStructureChange) {
+        takeSnapshot();
+      }
+
+      setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot));
+    },
+    [takeSnapshot, setNodes]
+  );
+
+  const onEdgesChange = useCallback(
+    (changes: EdgeChange[]) => {
+      const isStructureChange = changes.some(
+        (c) => c.type === "remove" || c.type === "add"
+      );
+
+      if (isStructureChange) {
+        takeSnapshot();
+      }
+      setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot));
+    },
+    [takeSnapshot, setEdges]
+  );
+
+  // --- 2. FIXED: onNodeDragStart (Captures 1 Snapshot per Drag) ---
+  // This fires ONCE when you start dragging. It saves the "Before" state.
+  // All subsequent moves update the state without snapshotting.
+  // When you Undo, it reverts to this snapshot.
+  const onNodeDragStart = useCallback(() => {
+    takeSnapshot();
+  }, [takeSnapshot]);
+
+  const onConnect = useCallback(
+    (params: Connection) => {
+      takeSnapshot();
+      setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot));
+    },
+    [takeSnapshot, setEdges]
+  );
+
+  // --- Helpers & Visual Logic ---
   const onMove = useCallback(() => {
     lastMoveTimeRef.current = Date.now();
   }, []);
-
-  // Standard Handlers
-  const onNodesChange = useCallback(
-    (changes: NodeChange[]) =>
-      setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
-    []
-  );
-  const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) =>
-      setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
-    []
-  );
-  const onConnect = useCallback(
-    (params: Connection) =>
-      setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-    []
-  );
 
   const hasManualTrigger = useMemo(() => {
     return nodes.some((node) => node.type === NodeType.MANUAL_TRIGGER);
   }, [nodes]);
 
-  // --- Logic: Distance Calculation ---
   const getClosestNode = useCallback(
     (node: Node) => {
       const internalNodes = Array.from(store.getState().nodeLookup.values());
-
       const closestNode = internalNodes.reduce(
         (res, n) => {
           if (n.id !== node.id) {
             const dx = n.internals.positionAbsolute.x - node.position.x;
             const dy = n.internals.positionAbsolute.y - node.position.y;
             const d = Math.sqrt(dx * dx + dy * dy);
-
             if (d < res.distance && d < MIN_DISTANCE) {
               res.distance = d;
               res.node = n;
@@ -111,27 +163,18 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
           }
           return res;
         },
-        {
-          distance: Number.MAX_VALUE,
-          node: null as Node | null,
-        }
+        { distance: Number.MAX_VALUE, node: null as Node | null }
       );
-
       return closestNode.node;
     },
     [store]
   );
 
   const { setCenter } = useReactFlow();
-
   const onNodeClick = (event: React.MouseEvent, node: Node) => {
-    if (Date.now() - lastMoveTimeRef.current < 200) {
-      return;
-    }
-
+    if (Date.now() - lastMoveTimeRef.current < 200) return;
     const width = node.measured?.width ?? node.width ?? 0;
     const height = node.measured?.height ?? node.height ?? 0;
-
     setCenter(node.position.x + width / 2, node.position.y + height / 2, {
       zoom: 1.2,
       duration: 800,
@@ -141,10 +184,8 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
   const maskColor =
     theme === "dark" ? "rgba(0, 0, 0, 0.7)" : "rgba(240, 240, 240, 0.6)";
 
-  // --- Logic: Drag Handler (Intersection + Proximity) ---
   const onNodeDrag: OnNodeDrag = useCallback(
     (e, node) => {
-      // --- 1. Edge Intersection Check ---
       const nodeDiv = document.querySelector(
         `.react-flow__node[data-id="${node.id}"]`
       );
@@ -182,13 +223,10 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         overlappedEdgeRef.current = null;
       }
 
-      // --- 2. Proximity Connect Check ---
       if (!isValidSplit) {
         const closeNode = getClosestNode(node);
-
         if (closeNode && closeNode.id !== closestNodeRef.current) {
           closestNodeRef.current = closeNode.id;
-
           setEdges((es) => {
             const tempEdge: Edge = {
               id: "temp-edge",
@@ -218,12 +256,12 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
     [updateEdge, getClosestNode, getEdge, setEdges]
   );
 
-  // --- Logic: Drop Handler (Finalize) ---
   const onNodeDragStop: OnNodeDrag = useCallback(
     (event, node) => {
-      // Split Edge (Intersection)
+      // Handle Split Edge (Intersection)
       const overlappedId = overlappedEdgeRef.current;
       if (overlappedId) {
+        takeSnapshot();
         const edge = getEdge(overlappedId);
         if (edge) {
           updateEdge(overlappedId, { target: node.id, style: {} });
@@ -243,25 +281,20 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         return;
       }
 
-      // Proximity Connect
+      // Handle Proximity Connect
       const closestId = closestNodeRef.current;
       if (closestId) {
-        // --- RETRIEVE HANDLE IDs ---
-        // We need to look up the internal node data to find the available handles.
         const internalNodeMap = store.getState().nodeLookup;
         const sourceNodeInternal = internalNodeMap.get(node.id);
         const targetNodeInternal = internalNodeMap.get(closestId);
 
         const sourceHandle =
           sourceNodeInternal?.internals?.handleBounds?.source?.[0]?.id ?? null;
-
         const targetHandle =
           targetNodeInternal?.internals?.handleBounds?.target?.[0]?.id ?? null;
 
         setEdges((es) => {
           const filtered = es.filter((e) => e.id !== "temp-edge");
-
-          // Check for duplicates
           const alreadyConnected = filtered.some(
             (e) =>
               e.source === node.id &&
@@ -277,7 +310,6 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
           const nextId = crypto.randomUUID
             ? crypto.randomUUID()
             : `${node.id}->${closestId}`;
-
           return [
             ...filtered,
             {
@@ -293,11 +325,11 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         closestNodeRef.current = null;
       }
     },
-    [getEdge, addEdges, updateEdge, store]
+    [getEdge, addEdges, updateEdge, store, takeSnapshot, setEdges]
   );
 
   return (
-    <div className="size-full dark:text-black! light:bg-[#FBFBFB]">
+    <div className="size-full dark:text-black! light:bg-[#FBFBFB] relative">
       <ReactFlow
         colorMode={(theme as ColorMode) || "system"}
         nodes={nodes}
@@ -305,6 +337,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDragStart={onNodeDragStart}
         nodeTypes={nodeComponents}
         onInit={setEditor}
         onNodeDrag={onNodeDrag}
@@ -321,7 +354,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         selectionMode={SelectionMode.Partial}
         onMove={onMove}
       >
-        <Controls />
+        <Controls className="pb-13" />
         <MiniMap
           position="top-left"
           pannable={true}
@@ -340,6 +373,31 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         />
         <Background />
         <NavigationControls />
+
+        {/* Undo/Redo Controls */}
+        <Panel position="bottom-left" className="flex gap-2">
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={undo}
+            disabled={!canUndo}
+            className="bg-background/80 text-black/50 dark:text-muted-foreground hover:text-black hover:dark:text-white backdrop-blur-sm transition-colors duration-150"
+            title="Undo (Ctrl+Z)"
+          >
+            <Undo className="size-4" />
+          </Button>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={redo}
+            disabled={!canRedo}
+            className="bg-background/80 text-black/50 dark:text-muted-foreground hover:text-black hover:dark:text-white backdrop-blur-sm transition-colors duration-150"
+            title="Redo (Ctrl+Shift+Z)"
+          >
+            <Redo className="size-4" />
+          </Button>
+        </Panel>
+
         <Panel position="top-right">
           <AddNodeButton />
         </Panel>
@@ -355,7 +413,6 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
 
 export const Editor = ({ workflowId }: { workflowId: string }) => {
   const { data: workflow } = useSuspenseWorkflow(workflowId);
-
   return (
     <ReactFlowProvider>
       <EditorCanvas workflow={workflow} />
