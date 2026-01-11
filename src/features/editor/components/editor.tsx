@@ -263,14 +263,31 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
       if (overlappedId) {
         const edge = getEdge(overlappedId);
         if (edge) {
-          updateEdge(overlappedId, { target: node.id, style: {} });
+          const internalNodeMap = store.getState().nodeLookup;
+          const newNodeInternal = internalNodeMap.get(node.id);
+
+          const newNodeInputHandle =
+            newNodeInternal?.internals?.handleBounds?.target?.[0]?.id ?? null;
+
+          const newNodeOutputHandle =
+            newNodeInternal?.internals?.handleBounds?.source?.[0]?.id ?? null;
+
+          updateEdge(overlappedId, {
+            target: node.id,
+            targetHandle: newNodeInputHandle,
+            style: {},
+          });
+
           const nextId = crypto.randomUUID
             ? crypto.randomUUID()
             : `${node.id}->${edge.target}`;
+
           addEdges({
             id: nextId,
             source: node.id,
+            sourceHandle: newNodeOutputHandle,
             target: edge.target,
+            targetHandle: edge.targetHandle,
             type: edge.type,
             animated: edge.animated,
           });
