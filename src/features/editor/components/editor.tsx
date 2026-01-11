@@ -75,6 +75,13 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
   // --- Keyboard Shortcuts ---
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      const isInputFocused =
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable;
+      if (isInputFocused) return;
+
       if (event.ctrlKey || event.metaKey) {
         if (event.key === "z") {
           event.preventDefault();
@@ -90,11 +97,8 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [undo, redo]);
 
-  // --- 1. FIXED: onNodesChange (Blocks Position Snapshots) ---
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      // Filter out changes that should NOT trigger a snapshot
-      // We ignore 'position' here because onNodeDragStart handles the "Move" snapshot
       const isStructureChange = changes.some(
         (c) => c.type === "remove" || c.type === "add"
       );
@@ -122,10 +126,6 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
     [takeSnapshot, setEdges]
   );
 
-  // --- 2. FIXED: onNodeDragStart (Captures 1 Snapshot per Drag) ---
-  // This fires ONCE when you start dragging. It saves the "Before" state.
-  // All subsequent moves update the state without snapshotting.
-  // When you Undo, it reverts to this snapshot.
   const onNodeDragStart = useCallback(() => {
     takeSnapshot();
   }, [takeSnapshot]);
@@ -261,7 +261,6 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
       // Handle Split Edge (Intersection)
       const overlappedId = overlappedEdgeRef.current;
       if (overlappedId) {
-        takeSnapshot();
         const edge = getEdge(overlappedId);
         if (edge) {
           updateEdge(overlappedId, { target: node.id, style: {} });

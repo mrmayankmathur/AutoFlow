@@ -1,5 +1,12 @@
 import { useCallback, useState } from "react";
-import { Edge, Node } from "@xyflow/react";
+import {
+  Edge,
+  Node,
+  NodeChange,
+  EdgeChange,
+  applyNodeChanges,
+  applyEdgeChanges,
+} from "@xyflow/react";
 
 type HistoryItem = {
   nodes: Node[];
@@ -40,13 +47,27 @@ export const useUndoRedo = (initialNodes: Node[], initialEdges: Edge[]) => {
     setFuture(newFuture);
   }, [nodes, edges, future]);
 
+  const onNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      setNodes((prev) => applyNodeChanges(changes, prev));
+    },
+    [setNodes]
+  );
+
+  const onEdgesChange = useCallback(
+    (changes: EdgeChange[]) => {
+      setEdges((prev) => applyEdgeChanges(changes, prev));
+    },
+    [setEdges]
+  );
+
   return {
     nodes,
     setNodes,
-    onNodesChange: setNodes, // specialized setter not needed
+    onNodesChange,
     edges,
     setEdges,
-    onEdgesChange: setEdges,
+    onEdgesChange,
     undo,
     redo,
     takeSnapshot,
