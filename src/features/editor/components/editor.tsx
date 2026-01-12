@@ -72,6 +72,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
   const closestNodeRef = useRef<string | null>(null);
   const lastMoveTimeRef = useRef<number>(0);
   const clipboardRef = useRef<{ nodes: Node[]; edges: Edge[] } | null>(null);
+  const [pasteCount, setPasteCount] = useState(0);
 
   // --- Keyboard Shortcuts ---
   useEffect(() => {
@@ -99,15 +100,16 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         // --- COPY ---
         if (event.key === "c") {
           event.preventDefault();
+          setPasteCount(0);
           const selectedNodes = getNodes().filter((node) => node.selected);
 
           if (selectedNodes.length > 0) {
             // Find edges that connect two selected nodes (internal edges)
-            const selectedEdgeIds = selectedNodes.map((node) => node.id);
+            const selectedNodeIds = selectedNodes.map((node) => node.id);
             const internalEdges = getEdges().filter(
               (edge) =>
-                selectedEdgeIds.includes(edge.source) &&
-                selectedEdgeIds.includes(edge.target)
+                selectedNodeIds.includes(edge.source) &&
+                selectedNodeIds.includes(edge.target)
             );
 
             clipboardRef.current = {
@@ -121,6 +123,9 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         if (event.key === "v" && clipboardRef.current) {
           event.preventDefault();
           takeSnapshot();
+
+          setPasteCount((prev) => prev + 1);
+          const currentOffset = (pasteCount + 1) * 50;
 
           const { nodes: copiedNodes, edges: copiedEdges } =
             clipboardRef.current;
@@ -139,11 +144,11 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
               ...node,
               id: newId,
               position: {
-                x: node.position.x + 50,
-                y: node.position.y + 50,
+                x: node.position.x + currentOffset,
+                y: node.position.y + currentOffset,
               },
               selected: true,
-              data: { ...node.data },
+              data: structuredClone(node.data),
             };
           });
 
@@ -169,11 +174,11 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
 
           // 3. Update State (Deselect old, Add new)
           setNodes((node) => [
-            ...node.map((n) => ({ ...n, selected: false })),
+            ...node.map((node) => ({ ...node, selected: false })),
             ...newNodes,
           ]);
           setEdges((edge) => [
-            ...edge.map((e) => ({ ...e, selected: false })),
+            ...edge.map((edge) => ({ ...edge, selected: false })),
             ...newEdges,
           ]);
         }
@@ -314,7 +319,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         const closeNode = getClosestNode(node);
         if (closeNode && closeNode.id !== closestNodeRef.current) {
           closestNodeRef.current = closeNode.id;
-          setEdges((es) => {
+          setEdges((edges) => {
             const tempEdge: Edge = {
               id: "temp-edge",
               source: node.id,
@@ -327,16 +332,19 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
               },
               type: "default",
             };
-            return [...es.filter((e) => e.id !== "temp-edge"), tempEdge];
+            return [
+              ...edges.filter((edge) => edge.id !== "temp-edge"),
+              tempEdge,
+            ];
           });
         } else if (!closeNode && closestNodeRef.current) {
           closestNodeRef.current = null;
-          setEdges((es) => es.filter((e) => e.id !== "temp-edge"));
+          setEdges((edges) => edges.filter((edge) => edge.id !== "temp-edge"));
         }
       } else {
         if (closestNodeRef.current) {
           closestNodeRef.current = null;
-          setEdges((es) => es.filter((e) => e.id !== "temp-edge"));
+          setEdges((edges) => edges.filter((edge) => edge.id !== "temp-edge"));
         }
       }
     },
@@ -379,6 +387,17 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
     []
   );
 
+  const getNodeCenter = useCallback((nodeInternal: any) => {
+    return {
+      x:
+        (nodeInternal?.internals?.positionAbsolute?.x ?? 0) +
+        (nodeInternal?.measured?.width ?? nodeInternal?.width ?? 0) / 2,
+      y:
+        (nodeInternal?.internals?.positionAbsolute?.y ?? 0) +
+        (nodeInternal?.measured?.height ?? nodeInternal?.height ?? 0) / 2,
+    };
+  }, []);
+
   const onNodeDragStop: OnNodeDrag = useCallback(
     (event, node) => {
       // Handle Split Edge (Intersection)
@@ -392,50 +411,12 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
           const targetNodeInternal = internalNodeMap.get(edge.target);
 
           // Get positions for distance calculation
-          const newNodePos = {
-            x:
-              (newNodeInternal?.internals?.positionAbsolute?.x ?? 0) +
-              (newNodeInternal?.measured?.width ??
-                newNodeInternal?.width ??
-                0) /
-                2,
-            y:
-              (newNodeInternal?.internals?.positionAbsolute?.y ?? 0) +
-              (newNodeInternal?.measured?.height ??
-                newNodeInternal?.height ??
-                0) /
-                2,
-          };
+          // Get positions for distance calculation
+          const newNodePos = getNodeCenter(newNodeInternal);
 
-          const sourceNodePos = {
-            x:
-              (sourceNodeInternal?.internals?.positionAbsolute?.x ?? 0) +
-              (sourceNodeInternal?.measured?.width ??
-                sourceNodeInternal?.width ??
-                0) /
-                2,
-            y:
-              (sourceNodeInternal?.internals?.positionAbsolute?.y ?? 0) +
-              (sourceNodeInternal?.measured?.height ??
-                sourceNodeInternal?.height ??
-                0) /
-                2,
-          };
+          const sourceNodePos = getNodeCenter(sourceNodeInternal);
 
-          const targetNodePos = {
-            x:
-              (targetNodeInternal?.internals?.positionAbsolute?.x ?? 0) +
-              (targetNodeInternal?.measured?.width ??
-                targetNodeInternal?.width ??
-                0) /
-                2,
-            y:
-              (targetNodeInternal?.internals?.positionAbsolute?.y ?? 0) +
-              (targetNodeInternal?.measured?.height ??
-                targetNodeInternal?.height ??
-                0) /
-                2,
-          };
+          const targetNodePos = getNodeCenter(targetNodeInternal);
 
           // Find closest input handle on NEW node (from source node)
           const newNodeInputHandle = getClosestHandle(
@@ -483,35 +464,8 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         const sourceNodeInternal = internalNodeMap.get(node.id);
         const targetNodeInternal = internalNodeMap.get(closestId);
 
-        const targetNodePos = {
-          x:
-            (targetNodeInternal?.internals?.positionAbsolute?.x ?? 0) +
-            (targetNodeInternal?.measured?.width ??
-              targetNodeInternal?.width ??
-              0) /
-              2,
-          y:
-            (targetNodeInternal?.internals?.positionAbsolute?.y ?? 0) +
-            (targetNodeInternal?.measured?.height ??
-              targetNodeInternal?.height ??
-              0) /
-              2,
-        };
-
-        const sourceNodePos = {
-          x:
-            (sourceNodeInternal?.internals?.positionAbsolute?.x ?? 0) +
-            (sourceNodeInternal?.measured?.width ??
-              sourceNodeInternal?.width ??
-              0) /
-              2,
-          y:
-            (sourceNodeInternal?.internals?.positionAbsolute?.y ?? 0) +
-            (sourceNodeInternal?.measured?.height ??
-              sourceNodeInternal?.height ??
-              0) /
-              2,
-        };
+        const targetNodePos = getNodeCenter(targetNodeInternal);
+        const sourceNodePos = getNodeCenter(sourceNodeInternal);
 
         const sourceHandle = getClosestHandle(
           sourceNodeInternal,
