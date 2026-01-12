@@ -64,13 +64,14 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
     canRedo,
   } = useUndoRedo(workflow.nodes, workflow.edges);
 
-  const { updateEdge, getEdge, addEdges } = useReactFlow();
+  const { updateEdge, getEdge, addEdges, getNodes, getEdges } = useReactFlow();
   const store = useStoreApi();
 
   // Refs
   const overlappedEdgeRef = useRef<string | null>(null);
   const closestNodeRef = useRef<string | null>(null);
   const lastMoveTimeRef = useRef<number>(0);
+  const clipboardRef = useRef<{ nodes: Node[]; edges: Edge[] } | null>(null);
 
   // --- Keyboard Shortcuts ---
   useEffect(() => {
@@ -83,19 +84,105 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
       if (isInputFocused) return;
 
       if (event.ctrlKey || event.metaKey) {
-        if (event.key === "z") {
+        // --- UNDO ---
+        if (event.key === "z" && !event.shiftKey) {
           event.preventDefault();
-          if (event.shiftKey) redo();
-          else undo();
-        } else if (event.key === "y") {
+          undo();
+        }
+
+        // --- REDO ---
+        if ((event.key === "z" && event.shiftKey) || event.key === "y") {
           event.preventDefault();
           redo();
         }
+
+        // --- COPY ---
+        if (event.key === "c") {
+          event.preventDefault();
+          const selectedNodes = getNodes().filter((node) => node.selected);
+
+          if (selectedNodes.length > 0) {
+            // Find edges that connect two selected nodes (internal edges)
+            const selectedEdgeIds = selectedNodes.map((node) => node.id);
+            const internalEdges = getEdges().filter(
+              (edge) =>
+                selectedEdgeIds.includes(edge.source) &&
+                selectedEdgeIds.includes(edge.target)
+            );
+
+            clipboardRef.current = {
+              nodes: selectedNodes.map((node) => ({ ...node })),
+              edges: internalEdges.map((edge) => ({ ...edge })),
+            };
+          }
+        }
+
+        // --- PASTE ---
+        if (event.key === "v" && clipboardRef.current) {
+          event.preventDefault();
+          takeSnapshot();
+
+          const { nodes: copiedNodes, edges: copiedEdges } =
+            clipboardRef.current;
+
+          // Map to track old ID -> new ID
+          const idMap = new Map<string, string>();
+
+          // 1. Create New Nodes with Offset
+          const newNodes = copiedNodes.map((node) => {
+            const newId = crypto.randomUUID
+              ? crypto.randomUUID()
+              : `${node.id}_copy_${Date.now()}`;
+            idMap.set(node.id, newId);
+
+            return {
+              ...node,
+              id: newId,
+              position: {
+                x: node.position.x + 50,
+                y: node.position.y + 50,
+              },
+              selected: true,
+              data: { ...node.data },
+            };
+          });
+
+          // 2. Create New Edges (Using reduce to avoid null types)
+          const newEdges = copiedEdges.reduce<Edge[]>((acc, edge) => {
+            const newSource = idMap.get(edge.source);
+            const newTarget = idMap.get(edge.target);
+
+            if (newSource && newTarget) {
+              const newEdge: Edge = {
+                ...edge,
+                id: crypto.randomUUID
+                  ? crypto.randomUUID()
+                  : `edge_${newSource}_${newTarget}`,
+                source: newSource,
+                target: newTarget,
+                selected: true,
+              };
+              acc.push(newEdge);
+            }
+            return acc;
+          }, []);
+
+          // 3. Update State (Deselect old, Add new)
+          setNodes((node) => [
+            ...node.map((n) => ({ ...n, selected: false })),
+            ...newNodes,
+          ]);
+          setEdges((edge) => [
+            ...edge.map((e) => ({ ...e, selected: false })),
+            ...newEdges,
+          ]);
+        }
       }
     };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [undo, redo]);
+  }, [undo, redo, takeSnapshot, getNodes, getEdges, setNodes, setEdges]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -256,6 +343,42 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
     [updateEdge, getClosestNode, getEdge, setEdges]
   );
 
+  const getClosestHandle = useCallback(
+    (
+      nodeInternal: any,
+      otherNodePos: { x: number; y: number },
+      handleType: "source" | "target"
+    ) => {
+      const handles = nodeInternal?.internals?.handleBounds?.[handleType];
+      if (!handles || handles.length === 0) return null;
+      if (handles.length === 1) return handles[0].id;
+
+      let closestHandleId = null;
+      let minDistance = Number.MAX_VALUE;
+
+      const nodeX = nodeInternal.internals?.positionAbsolute?.x ?? 0;
+      const nodeY = nodeInternal.internals?.positionAbsolute?.y ?? 0;
+
+      for (const handle of handles) {
+        // Handle position is relative to the node
+        const handleX = nodeX + handle.x + handle.width / 2;
+        const handleY = nodeY + handle.y + handle.height / 2;
+
+        const dx = handleX - otherNodePos.x;
+        const dy = handleY - otherNodePos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestHandleId = handle.id;
+        }
+      }
+
+      return closestHandleId;
+    },
+    []
+  );
+
   const onNodeDragStop: OnNodeDrag = useCallback(
     (event, node) => {
       // Handle Split Edge (Intersection)
@@ -265,12 +388,68 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         if (edge) {
           const internalNodeMap = store.getState().nodeLookup;
           const newNodeInternal = internalNodeMap.get(node.id);
+          const sourceNodeInternal = internalNodeMap.get(edge.source);
+          const targetNodeInternal = internalNodeMap.get(edge.target);
 
-          const newNodeInputHandle =
-            newNodeInternal?.internals?.handleBounds?.target?.[0]?.id ?? null;
+          // Get positions for distance calculation
+          const newNodePos = {
+            x:
+              (newNodeInternal?.internals?.positionAbsolute?.x ?? 0) +
+              (newNodeInternal?.measured?.width ??
+                newNodeInternal?.width ??
+                0) /
+                2,
+            y:
+              (newNodeInternal?.internals?.positionAbsolute?.y ?? 0) +
+              (newNodeInternal?.measured?.height ??
+                newNodeInternal?.height ??
+                0) /
+                2,
+          };
 
-          const newNodeOutputHandle =
-            newNodeInternal?.internals?.handleBounds?.source?.[0]?.id ?? null;
+          const sourceNodePos = {
+            x:
+              (sourceNodeInternal?.internals?.positionAbsolute?.x ?? 0) +
+              (sourceNodeInternal?.measured?.width ??
+                sourceNodeInternal?.width ??
+                0) /
+                2,
+            y:
+              (sourceNodeInternal?.internals?.positionAbsolute?.y ?? 0) +
+              (sourceNodeInternal?.measured?.height ??
+                sourceNodeInternal?.height ??
+                0) /
+                2,
+          };
+
+          const targetNodePos = {
+            x:
+              (targetNodeInternal?.internals?.positionAbsolute?.x ?? 0) +
+              (targetNodeInternal?.measured?.width ??
+                targetNodeInternal?.width ??
+                0) /
+                2,
+            y:
+              (targetNodeInternal?.internals?.positionAbsolute?.y ?? 0) +
+              (targetNodeInternal?.measured?.height ??
+                targetNodeInternal?.height ??
+                0) /
+                2,
+          };
+
+          // Find closest input handle on NEW node (from source node)
+          const newNodeInputHandle = getClosestHandle(
+            newNodeInternal,
+            sourceNodePos,
+            "target"
+          );
+
+          // Find closest output handle on NEW node (to target node)
+          const newNodeOutputHandle = getClosestHandle(
+            newNodeInternal,
+            targetNodePos,
+            "source"
+          );
 
           updateEdge(overlappedId, {
             target: node.id,
@@ -304,10 +483,47 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         const sourceNodeInternal = internalNodeMap.get(node.id);
         const targetNodeInternal = internalNodeMap.get(closestId);
 
-        const sourceHandle =
-          sourceNodeInternal?.internals?.handleBounds?.source?.[0]?.id ?? null;
-        const targetHandle =
-          targetNodeInternal?.internals?.handleBounds?.target?.[0]?.id ?? null;
+        const targetNodePos = {
+          x:
+            (targetNodeInternal?.internals?.positionAbsolute?.x ?? 0) +
+            (targetNodeInternal?.measured?.width ??
+              targetNodeInternal?.width ??
+              0) /
+              2,
+          y:
+            (targetNodeInternal?.internals?.positionAbsolute?.y ?? 0) +
+            (targetNodeInternal?.measured?.height ??
+              targetNodeInternal?.height ??
+              0) /
+              2,
+        };
+
+        const sourceNodePos = {
+          x:
+            (sourceNodeInternal?.internals?.positionAbsolute?.x ?? 0) +
+            (sourceNodeInternal?.measured?.width ??
+              sourceNodeInternal?.width ??
+              0) /
+              2,
+          y:
+            (sourceNodeInternal?.internals?.positionAbsolute?.y ?? 0) +
+            (sourceNodeInternal?.measured?.height ??
+              sourceNodeInternal?.height ??
+              0) /
+              2,
+        };
+
+        const sourceHandle = getClosestHandle(
+          sourceNodeInternal,
+          targetNodePos,
+          "source"
+        );
+
+        const targetHandle = getClosestHandle(
+          targetNodeInternal,
+          sourceNodePos,
+          "target"
+        );
 
         setEdges((es) => {
           const filtered = es.filter((e) => e.id !== "temp-edge");
@@ -341,7 +557,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         closestNodeRef.current = null;
       }
     },
-    [getEdge, addEdges, updateEdge, store, takeSnapshot, setEdges]
+    [getEdge, addEdges, updateEdge, store, setEdges, getClosestHandle]
   );
 
   return (
