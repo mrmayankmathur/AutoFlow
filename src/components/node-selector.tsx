@@ -51,6 +51,24 @@ const executionNodes: NodeTypeOption[] = [
     description: "Makes an HTTP request to an endpoint.",
     icon: GlobeIcon,
   },
+  {
+    type: NodeType.GEMINI,
+    label: "Gemini",
+    description: "Uses Google Gemini to generate content.",
+    icon: "/logos/gemini.svg",
+  },
+  {
+    type: NodeType.ANTHROPIC,
+    label: "Anthropic",
+    description: "Uses Anthropic to generate content.",
+    icon: "/logos/anthropic.svg",
+  },
+  {
+    type: NodeType.OPENAI,
+    label: "OpenAI",
+    description: "Uses OpenAI to generate content.",
+    icon: "/logos/openai.svg",
+  },
 ];
 
 interface NodeSelectorProps {
@@ -170,7 +188,7 @@ export function NodeSelector({
                     <img
                       src={Icon}
                       alt={nodeType.label}
-                      className="size-5 object-contain rounded-sm"
+                      className="size-5 object-contain rounded-sm text-white"
                     />
                   ) : (
                     <Icon className="size-5" />
