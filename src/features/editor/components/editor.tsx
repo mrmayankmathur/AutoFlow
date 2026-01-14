@@ -24,6 +24,7 @@ import {
   type OnNodeDrag,
   type DefaultEdgeOptions,
   SelectionMode,
+  getOutgoers,
 } from "@xyflow/react";
 import { Undo, Redo } from "lucide-react";
 
@@ -398,6 +399,36 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
     };
   }, []);
 
+  // --- Cycle Detection Helper ---
+  const isCyclic = useCallback(
+    (source: string, target: string) => {
+      const nodes = getNodes();
+      const edges = getEdges();
+
+      // 1. Prevent connecting to self
+      if (source === target) return true;
+
+      // 2. Find target node to start traversal
+      const targetNode = nodes.find((n) => n.id === target);
+      if (!targetNode) return false; // Should not happen, but safe to return false
+
+      // 3. Check for cycles (DFS)
+      const checkPath = (node: Node, visited = new Set<string>()) => {
+        if (visited.has(node.id)) return false;
+        visited.add(node.id);
+
+        for (const outgoer of getOutgoers(node, nodes, edges)) {
+          if (outgoer.id === source) return true; // Cycle detected
+          if (checkPath(outgoer, visited)) return true;
+        }
+        return false;
+      };
+
+      return checkPath(targetNode);
+    },
+    [getNodes, getEdges]
+  );
+
   const onNodeDragStop: OnNodeDrag = useCallback(
     (event, node) => {
       // Handle Split Edge (Intersection)
@@ -460,6 +491,13 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
       // Handle Proximity Connect
       const closestId = closestNodeRef.current;
       if (closestId) {
+        if (isCyclic(node.id, closestId)) {
+          // If cyclic, clean up temp edge and abort
+          closestNodeRef.current = null;
+          setEdges((es) => es.filter((e) => e.id !== "temp-edge"));
+          return;
+        }
+
         const internalNodeMap = store.getState().nodeLookup;
         const sourceNodeInternal = internalNodeMap.get(node.id);
         const targetNodeInternal = internalNodeMap.get(closestId);
@@ -511,7 +549,26 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         closestNodeRef.current = null;
       }
     },
-    [getEdge, addEdges, updateEdge, store, setEdges, getClosestHandle]
+    [
+      getEdge,
+      addEdges,
+      updateEdge,
+      store,
+      setEdges,
+      getClosestHandle,
+      isCyclic,
+      getNodeCenter,
+    ]
+  );
+
+  const isValidConnection = useCallback(
+    (connection: Connection | Edge) => {
+      if (!connection.source || !connection.target) return false;
+
+      // If isCyclic returns true, the connection is INVALID
+      return !isCyclic(connection.source, connection.target);
+    },
+    [isCyclic]
   );
 
   return (
@@ -539,6 +596,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         panActivationKeyCode="Space"
         selectionMode={SelectionMode.Partial}
         onMove={onMove}
+        isValidConnection={isValidConnection}
       >
         <Controls className="pb-13" />
         <MiniMap
