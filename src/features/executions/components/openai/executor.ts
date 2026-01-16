@@ -4,6 +4,7 @@ import { generateText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import Handlebars from "handlebars";
 import { openAIChannel } from "@/inngest/channels/openai";
+import { prisma } from "@/lib/db";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -14,6 +15,7 @@ Handlebars.registerHelper("json", (context) => {
 
 type OpenAIData = {
   variableName?: string;
+  credentialId?: string;
   model?: string;
   systemPrompt?: string;
   userPrompt?: string;
@@ -45,6 +47,17 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
     throw new NonRetriableError("OPENAI NODE: Variable name is required");
   }
 
+  if (!data.credentialId) {
+    await publish(
+      openAIChannel().status({
+        nodeId,
+        status: "error",
+      })
+    );
+
+    throw new NonRetriableError("OPENAI NODE: Credential is required");
+  }
+
   if (!data.userPrompt) {
     await publish(
       openAIChannel().status({
@@ -56,20 +69,33 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
     throw new NonRetriableError("OPENAI NODE: User prompt is required");
   }
 
-  // TODO: Throw if credential is missing
-
   const systemPrompt = data.systemPrompt
     ? Handlebars.compile(data.systemPrompt)(context)
     : "You are a helpful assistant.";
 
   const userPrompt = Handlebars.compile(data.userPrompt)(context);
 
-  // TODO: Fetch credentials that user selected
+  const credential = await step.run("get-credential", () => {
+    return prisma.credential.findUnique({
+      where: {
+        id: data.credentialId,
+      },
+    });
+  });
 
-  const credentialValue = process.env.GITHUB_TOKEN!;
+  if (!credential) {
+    await publish(
+      openAIChannel().status({
+        nodeId,
+        status: "error",
+      })
+    );
+
+    throw new NonRetriableError("OPENAI NODE: Credential not found");
+  }
 
   const openai = createOpenAI({
-    apiKey: credentialValue,
+    apiKey: credential.value,
     baseURL: "https://models.github.ai/inference",
   });
 

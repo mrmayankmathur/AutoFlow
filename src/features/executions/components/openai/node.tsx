@@ -10,6 +10,7 @@ import { fetchOpenAIRealtimeToken } from "./actions";
 
 type OpenAINodeData = {
   variableName?: string;
+  credentialId?: string;
   model?: string;
   systemPrompt?: string;
   userPrompt?: string;
