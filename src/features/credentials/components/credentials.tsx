@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,7 +15,7 @@ import {
   SearchIcon,
   MoreVerticalIcon,
   FilterIcon,
-  WorkflowIcon,
+  FolderKeyIcon,
 } from "lucide-react";
 
 import {
@@ -103,6 +103,17 @@ export const CredentialsFilterBar = ({
 
   const activeLabel = filters.find((f) => f.value === currentFilter)?.label;
 
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
       {/* DESKTOP: Tabs */}
@@ -162,8 +173,9 @@ export const CredentialsFilterBar = ({
 
       <div className="flex items-center gap-3 w-full lg:w-auto">
         <div className="flex items-center gap-3 w-full lg:hidden">
-          <CredentialsSearch />
+          {!isDesktop && <CredentialsSearch />}
         </div>
+
         <Button
           asChild
           className="h-9 shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
@@ -191,7 +203,7 @@ export const CredentialsSearch = () => {
       <Input
         value={searchValue}
         onChange={(e) => onSearchChange(e.target.value)}
-        placeholder="Search workflows..."
+        placeholder="Search Credentials"
         className="pl-9 h-9 w-full md:w-[250px] bg-background"
       />
     </div>
@@ -212,7 +224,7 @@ export const CredentialsList = () => {
   }
 
   return (
-    <div className="flex flex-col px-10 w-full h-full min-h-[calc(100vh-135px)]">
+    <div className="flex flex-col lg:px-10 md:px-5 px-2 w-full h-full min-h-[calc(100vh-135px)]">
       <CredentialsHeader />
 
       <CredentialsFilterBar
@@ -292,20 +304,15 @@ export const CredentialCard = ({ data }: { data: Credential }) => {
           removeCredential.isPending && "opacity-50 pointer-events-none"
         )}
       >
-        {/* Background Gradient & Stars Layer 
-            - Opacity increases from 60% to 100% on hover
-            - Always visible as requested
-          */}
         <div
           className={cn(
             "absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl transition-opacity duration-500 bg-linear-to-br to-transparent pointer-events-none z-0",
             style.gradient,
-            "opacity-60 group-hover:opacity-100" // Always visible, brighter on hover
+            "opacity-60 group-hover:opacity-100"
           )}
         />
 
         <div className="absolute top-0 right-0 w-32 h-32 z-0 pointer-events-none">
-          {/* <StarsPattern className="text-white dark:text-white" /> */}
           <Image
             src="/hbvgvtv-removebg-preview.png"
             alt=""
@@ -314,7 +321,7 @@ export const CredentialCard = ({ data }: { data: Credential }) => {
           />
         </div>
 
-        <CardHeader className="flex flex-row items-start justify-between pb-4 space-y-0 relative z-10">
+        <CardHeader className="flex flex-row items-start justify-between pb-4 space-y-0 relative z-1">
           <div
             className={cn(
               "size-12 rounded-xl flex items-center justify-center border transition-colors",
@@ -349,7 +356,7 @@ export const CredentialCard = ({ data }: { data: Credential }) => {
           </DropdownMenu>
         </CardHeader>
 
-        <CardContent className="flex-1 space-y-1.5 relative z-10">
+        <CardContent className="flex-1 space-y-1.5 relative z-1">
           <h3
             className={cn(
               "font-semibold text-lg leading-none tracking-tight",
@@ -363,7 +370,7 @@ export const CredentialCard = ({ data }: { data: Credential }) => {
           </p>
         </CardContent>
 
-        <CardFooter className="pt-4 border-t bg-muted/10 text-xs text-muted-foreground flex justify-between items-center mt-auto relative z-10 backdrop-blur-[1px]">
+        <CardFooter className="pt-4 border-t bg-muted/10 text-xs text-muted-foreground flex justify-between items-center mt-auto relative z-1 backdrop-blur-[1px]">
           <div className="flex items-center gap-1.5">
             <CalendarIcon className="size-3.5" />
             <span>
@@ -401,16 +408,23 @@ export const CredentialsError = () => (
 );
 
 export const CredentialsEmpty = () => {
+  const [typeFilter, setTypeFilter] = useState<CredentialType | "ALL">("ALL");
   return (
     <>
-      <div className="flex min-h-[400px] max-w-[85vw] m-18 flex-col items-center justify-center rounded-lg border border-dashed bg-background p-8 text-center animate-in fade-in-50">
+      <CredentialsHeader />
+
+      <CredentialsFilterBar
+        currentFilter={typeFilter}
+        onFilterChange={setTypeFilter}
+      />
+      <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed bg-background p-8 text-center animate-in fade-in-50">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-          <WorkflowIcon className="h-10 w-10 text-muted-foreground" />
+          <FolderKeyIcon className="h-10 w-10 text-muted-foreground" />
         </div>
-        <h3 className="mt-4 text-lg font-semibold">No workflows created</h3>
+        <h3 className="mt-4 text-lg font-semibold">No Credentials created</h3>
         <p className="mb-4 mt-2 text-sm text-muted-foreground max-w-sm">
-          You haven't created any workflows yet. Start automating your tasks by
-          creating your first workflow.
+          You haven't created any credentials yet. Start automating your tasks
+          by creating your first credential.
         </p>
         <Button
           asChild
