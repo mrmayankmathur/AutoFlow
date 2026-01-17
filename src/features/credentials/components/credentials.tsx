@@ -27,11 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  LoadingView,
-  ErrorView,
-  EntityPagination,
-} from "@/components/entity-components";
+import { ErrorView, EntityPagination } from "@/components/entity-components";
 import {
   useRemoveCredential,
   useSuspenseCredentials,
@@ -470,10 +466,9 @@ export const CredentialsLoading = () => {
               </div>
             </div>
 
-            {/* Footer Skeleton */}
             <div className="flex items-center justify-between p-4 pt-4 border-t bg-muted/10 mt-auto">
-              <Skeleton className="h-4 w-24" /> {/* Date */}
-              <Skeleton className="h-5 w-16 rounded-full" /> {/* Badge */}
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-5 w-16 rounded-full" />
             </div>
           </div>
         ))}
@@ -482,13 +477,51 @@ export const CredentialsLoading = () => {
   );
 };
 
-export const LoadingAnimate = () => (
-  <div className="p-4 md:px-22 md:py-16 h-full">
-    <div className="mx-auto py-46 w-full flex flex-col gap-y-8 h-full">
-      <LoadingView message="Loading credentials..." />
+export const LoadingAnimate = () => {
+  return (
+    <div className="w-full animate-in fade-in-50 duration-500">
+      <Skeleton className="h-9 w-40 mt-6 mb-6 rounded-md bg-muted/50" />
+
+      <div className="rounded-xl border border-border/50 bg-card/50 shadow-xl overflow-hidden">
+        <div className="p-6 pb-2">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-12 w-12 rounded-lg shrink-0" />
+            <div className="space-y-2 w-full">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-full max-w-sm" />
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full rounded-md" />
+          </div>
+
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-[60px] w-full rounded-md" />
+          </div>
+
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-10 w-full rounded-md" />
+            <div className="flex items-center gap-2 mt-2">
+              <Skeleton className="h-3 w-3 rounded-full" />
+              <Skeleton className="h-3 w-64" />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Skeleton className="h-10 w-24 rounded-md" />
+            <Skeleton className="h-10 w-32 rounded-md" />
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const CredentialsError = () => (
   <ErrorView message="Error loading credentials" />
