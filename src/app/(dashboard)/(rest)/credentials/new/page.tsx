@@ -3,9 +3,14 @@ import { requireAuth } from "@/lib/auth-utils";
 
 const Page = async () => {
   await requireAuth();
+
   return (
-    <div className="p-4 md:px-22 md:py-16 h-full">
-      <div className="mx-auto py-16 w-full flex flex-col gap-y-8 h-full">
+    <div className="min-h-[calc(100vh-72px)] w-full bg-linear-to-br from-background to-muted/40">
+      <div className="mx-auto max-w-3xl px-4 py-10 md:px-0">
+        <h1 className="text-3xl font-semibold tracking-tight">Credentials</h1>
+        <p className="text-muted-foreground">
+          Securely store and manage your API keys for different providers.
+        </p>
         <CredentialForm />
       </div>
     </div>

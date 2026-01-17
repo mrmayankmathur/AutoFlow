@@ -482,6 +482,14 @@ export const CredentialsLoading = () => {
   );
 };
 
+export const LoadingAnimate = () => (
+  <div className="p-4 md:px-22 md:py-16 h-full">
+    <div className="mx-auto py-46 w-full flex flex-col gap-y-8 h-full">
+      <LoadingView message="Loading credentials..." />
+    </div>
+  </div>
+);
+
 export const CredentialsError = () => (
   <ErrorView message="Error loading credentials" />
 );
