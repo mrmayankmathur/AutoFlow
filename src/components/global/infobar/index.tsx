@@ -17,9 +17,6 @@ import { useCredentialsParams } from "@/features/credentials/hooks/use-credentia
 
 type Props = {};
 
-// 1. EXTRACTED COMPONENT
-// We move the hook inside this component. If this component isn't rendered,
-// the hook never runs, preventing it from resetting your URL params.
 const GlobalSearchInput = () => {
   const isCredentialsPage = usePathname()?.includes("/credentials");
 

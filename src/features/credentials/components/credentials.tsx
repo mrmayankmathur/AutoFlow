@@ -17,9 +17,17 @@ import {
   FilterIcon,
   FolderKeyIcon,
 } from "lucide-react";
-
 import {
-  EmptyView2,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   LoadingView,
   ErrorView,
   EntityPagination,
@@ -46,6 +54,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CredentialLogos: Record<CredentialType, string> = {
   [CredentialType.OPENAI]: "/logos/openai.svg",
@@ -274,11 +283,13 @@ export const CredentialsPagination = () => {
 export const CredentialCard = ({ data }: { data: Credential }) => {
   const removeCredential = useRemoveCredential();
   const router = useRouter();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleRemove = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     removeCredential.mutate({ id: data.id });
+    setShowDeleteDialog(false);
   };
 
   const style = ProviderStyles[data.type] || {
@@ -314,8 +325,8 @@ export const CredentialCard = ({ data }: { data: Credential }) => {
 
         <div className="absolute top-0 right-0 w-32 h-32 z-0 pointer-events-none">
           <Image
-            src="/hbvgvtv-removebg-preview.png"
-            alt=""
+            src="/stars-pattern.png"
+            alt="Stars Pattern"
             fill
             className="scale-175 scale-y-200 opacity-20 group-hover:opacity-30 rotate-350 transition-opacity duration-300"
           />
@@ -346,7 +357,10 @@ export const CredentialCard = ({ data }: { data: Credential }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <DropdownMenuItem
-                onClick={handleRemove}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDeleteDialog(true);
+                }}
                 className="text-destructive focus:text-destructive cursor-pointer"
               >
                 <TrashIcon className="size-4 mr-2" />
@@ -384,6 +398,29 @@ export const CredentialCard = ({ data }: { data: Credential }) => {
           </div>
         </CardFooter>
       </Card>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              credential "{data.name}" and remove it from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={handleRemove}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   );
 };
@@ -400,9 +437,51 @@ export const CredentialsContainer = ({
   );
 };
 
-export const CredentialsLoading = () => (
-  <LoadingView message="Loading credentials..." />
-);
+export const CredentialsLoading = () => {
+  const [typeFilter, setTypeFilter] = useState<CredentialType | "ALL">("ALL");
+  return (
+    <div className="flex flex-col lg:px-10 md:px-5 px-2 w-full h-full min-h-[calc(100vh-135px)]">
+      <CredentialsHeader />
+      <CredentialsFilterBar
+        currentFilter={typeFilter}
+        onFilterChange={setTypeFilter}
+      />
+
+      {/* Card Grid Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 pb-6">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex flex-col h-full rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden"
+          >
+            <div className="flex flex-col flex-1 p-6 pb-4">
+              <div className="flex items-start justify-between mb-4">
+                {/* Icon Skeleton */}
+                <Skeleton className="h-12 w-12 rounded-xl" />
+                {/* Menu Dot Skeleton */}
+                <Skeleton className="h-8 w-8 rounded-md" />
+              </div>
+
+              {/* Title & Desc Skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+            </div>
+
+            {/* Footer Skeleton */}
+            <div className="flex items-center justify-between p-4 pt-4 border-t bg-muted/10 mt-auto">
+              <Skeleton className="h-4 w-24" /> {/* Date */}
+              <Skeleton className="h-5 w-16 rounded-full" /> {/* Badge */}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export const CredentialsError = () => (
   <ErrorView message="Error loading credentials" />
 );
@@ -410,7 +489,7 @@ export const CredentialsError = () => (
 export const CredentialsEmpty = () => {
   const [typeFilter, setTypeFilter] = useState<CredentialType | "ALL">("ALL");
   return (
-    <>
+    <div className="flex flex-col lg:px-10 md:px-5 px-2 w-full h-full min-h-[calc(100vh-135px)]">
       <CredentialsHeader />
 
       <CredentialsFilterBar
@@ -436,6 +515,6 @@ export const CredentialsEmpty = () => {
           </Link>
         </Button>
       </div>
-    </>
+    </div>
   );
 };
