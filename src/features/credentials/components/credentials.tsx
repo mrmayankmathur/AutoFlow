@@ -1,28 +1,182 @@
 "use client";
 
+import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Credential, CredentialType } from "@prisma/client";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  TrashIcon,
+  CalendarIcon,
+  ShieldCheckIcon,
+  PlusIcon,
+  SearchIcon,
+  MoreVerticalIcon,
+  FilterIcon,
+  WorkflowIcon,
+} from "lucide-react";
 
 import {
   EmptyView2,
-  EntityContainer,
-  EntityHeader,
-  EntityItem,
-  EntityList,
-  EntityPagination,
-  EntitySearch,
-  ErrorView,
   LoadingView,
+  ErrorView,
+  EntityPagination,
 } from "@/components/entity-components";
-
 import {
   useRemoveCredential,
   useSuspenseCredentials,
 } from "../hooks/use-credentials";
-import { useRouter } from "next/navigation";
 import { useCredentialsParams } from "../hooks/use-credentials-params";
-import { Credential, CredentialType } from "@prisma/client";
 import { useEntitySearch } from "@/hooks/use-entity-search";
-import Image from "next/image";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const CredentialLogos: Record<CredentialType, string> = {
+  [CredentialType.OPENAI]: "/logos/openai.svg",
+  [CredentialType.ANTHROPIC]: "/logos/anthropic.svg",
+  [CredentialType.GEMINI]: "/logos/gemini.svg",
+};
+
+const ProviderStyles: Record<
+  CredentialType,
+  { gradient: string; text: string; iconBg: string }
+> = {
+  [CredentialType.OPENAI]: {
+    gradient: "from-emerald-500/30 via-teal-500/20 to-transparent",
+    text: "text-emerald-600 dark:text-emerald-400",
+    iconBg: "bg-emerald-500/10",
+  },
+  [CredentialType.ANTHROPIC]: {
+    gradient: "from-orange-500/30 via-amber-500/20 to-transparent",
+    text: "text-orange-600 dark:text-orange-400",
+    iconBg: "bg-orange-500/10",
+  },
+  [CredentialType.GEMINI]: {
+    gradient: "from-blue-500/30 via-violet-500/20 to-transparent",
+    text: "text-blue-600 dark:text-blue-400",
+    iconBg: "bg-blue-500/10",
+  },
+};
+
+export const CredentialsHeader = () => {
+  return (
+    <div className="flex flex-col gap-1 mb-8 px-1">
+      <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        Credentials
+      </h1>
+      <p className="text-muted-foreground text-sm">
+        Connect and manage your API keys for AI providers.
+      </p>
+    </div>
+  );
+};
+
+export const CredentialsFilterBar = ({
+  currentFilter,
+  onFilterChange,
+}: {
+  currentFilter: CredentialType | "ALL";
+  onFilterChange: (val: CredentialType | "ALL") => void;
+}) => {
+  const filters = [
+    { label: "All Credentials", value: "ALL" },
+    { label: "Gemini", value: CredentialType.GEMINI },
+    { label: "OpenAI", value: CredentialType.OPENAI },
+    { label: "Anthropic", value: CredentialType.ANTHROPIC },
+  ];
+
+  const activeLabel = filters.find((f) => f.value === currentFilter)?.label;
+
+  return (
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      {/* DESKTOP: Tabs */}
+      <div className="hidden lg:flex items-center p-1 bg-muted/60 rounded-xl border w-fit gap-x-1.5">
+        {filters.map((filter) => (
+          <Button
+            key={filter.value}
+            onClick={() =>
+              onFilterChange(filter.value as CredentialType | "ALL")
+            }
+            className={cn(
+              "px-4 py-1.5 text-sm font-medium rounded-lg transition-all duration-200",
+              currentFilter === filter.value
+                ? "bg-background text-foreground hover:bg-background shadow-sm"
+                : "text-muted-foreground bg-transparent hover:text-foreground hover:bg-muted"
+            )}
+          >
+            {filter.label}
+          </Button>
+        ))}
+      </div>
+
+      {/* MOBILE/TABLET: Dropdown */}
+      <div className="lg:hidden w-full">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-between bg-background border-dashed"
+            >
+              <span className="flex items-center">
+                <FilterIcon className="mr-2 size-4 text-muted-foreground" />
+                {activeLabel}
+              </span>
+              <span className="text-xs text-muted-foreground opacity-50">
+                Filter
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-[--radix-dropdown-menu-trigger-width]"
+            align="start"
+          >
+            {filters.map((filter) => (
+              <DropdownMenuItem
+                key={filter.value}
+                onClick={() =>
+                  onFilterChange(filter.value as CredentialType | "ALL")
+                }
+              >
+                {filter.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="flex items-center gap-3 w-full lg:w-auto">
+        <div className="flex items-center gap-3 w-full lg:hidden">
+          <CredentialsSearch />
+        </div>
+        <Button
+          asChild
+          className="h-9 shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          <Link href="/credentials/new">
+            <PlusIcon className="mr-2 size-4" />
+            Add New
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 export const CredentialsSearch = () => {
   const [params, setParams] = useCredentialsParams();
@@ -32,46 +186,65 @@ export const CredentialsSearch = () => {
   });
 
   return (
-    <EntitySearch
-      value={searchValue}
-      onChange={onSearchChange}
-      placeholder="Search credentials..."
-    />
-  );
-};
-
-export const CredentialsList = () => {
-  const credentials = useSuspenseCredentials();
-
-  return (
-    <div className="lg:ml-10">
-      <EntityList
-        items={credentials.data.items}
-        getKey={(credential) => credential.id}
-        renderItem={(credential) => <CredentialItem data={credential} />}
-        emptyView={<CredentialsEmpty />}
+    <div className="relative group flex-1 md:flex-none">
+      <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+      <Input
+        value={searchValue}
+        onChange={(e) => onSearchChange(e.target.value)}
+        placeholder="Search workflows..."
+        className="pl-9 h-9 w-full md:w-[250px] bg-background"
       />
     </div>
   );
 };
 
-export const CredentialsHeader = ({ disabled }: { disabled?: boolean }) => {
+export const CredentialsList = () => {
+  const credentials = useSuspenseCredentials();
+  const [typeFilter, setTypeFilter] = useState<CredentialType | "ALL">("ALL");
+
+  const filteredItems = credentials.data.items.filter((item) => {
+    if (typeFilter === "ALL") return true;
+    return item.type === typeFilter;
+  });
+
+  if (credentials.data.items.length === 0) {
+    return <CredentialsEmpty />;
+  }
+
   return (
-    <div className="lg:ml-10">
-      <EntityHeader
-        title="Credentials"
-        description="Create and manage your credentials"
-        newButtonHref="/credentials/new"
-        newButtonLabel="Create Credential"
-        disabled={disabled}
+    <div className="flex flex-col px-10 w-full h-full min-h-[calc(100vh-135px)]">
+      <CredentialsHeader />
+
+      <CredentialsFilterBar
+        currentFilter={typeFilter}
+        onFilterChange={setTypeFilter}
       />
+
+      {filteredItems.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center min-h-[300px] border border-dashed rounded-xl bg-muted/10">
+          <p className="text-muted-foreground">
+            No credentials found for this filter.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 pb-6">
+          <AnimatePresence mode="popLayout">
+            {filteredItems.map((credential) => (
+              <CredentialCard key={credential.id} data={credential} />
+            ))}
+          </AnimatePresence>
+        </div>
+      )}
+
+      <div className="mt-auto py-4 border-t">
+        <CredentialsPagination />
+      </div>
     </div>
   );
 };
 
 export const CredentialsPagination = () => {
   const credentials = useSuspenseCredentials();
-
   const [params, setParams] = useCredentialsParams();
 
   return (
@@ -86,79 +259,169 @@ export const CredentialsPagination = () => {
   );
 };
 
+export const CredentialCard = ({ data }: { data: Credential }) => {
+  const removeCredential = useRemoveCredential();
+  const router = useRouter();
+
+  const handleRemove = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removeCredential.mutate({ id: data.id });
+  };
+
+  const style = ProviderStyles[data.type] || {
+    gradient: "from-gray-500/20 via-gray-500/5",
+    text: "text-foreground",
+    iconBg: "bg-muted",
+  };
+  const logo = CredentialLogos[data.type] || "/logos/openai.svg";
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Card
+        onClick={() => router.push(`/credentials/${data.id}`)}
+        className={cn(
+          "relative group flex flex-col h-full overflow-hidden cursor-pointer border transition-all duration-300",
+          "bg-card hover:border-primary/40 hover:shadow-lg dark:hover:shadow-primary/5",
+          removeCredential.isPending && "opacity-50 pointer-events-none"
+        )}
+      >
+        {/* Background Gradient & Stars Layer 
+            - Opacity increases from 60% to 100% on hover
+            - Always visible as requested
+          */}
+        <div
+          className={cn(
+            "absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl transition-opacity duration-500 bg-linear-to-br to-transparent pointer-events-none z-0",
+            style.gradient,
+            "opacity-60 group-hover:opacity-100" // Always visible, brighter on hover
+          )}
+        />
+
+        <div className="absolute top-0 right-0 w-32 h-32 z-0 pointer-events-none">
+          {/* <StarsPattern className="text-white dark:text-white" /> */}
+          <Image
+            src="/hbvgvtv-removebg-preview.png"
+            alt=""
+            fill
+            className="scale-175 scale-y-200 opacity-20 group-hover:opacity-30 rotate-350 transition-opacity duration-300"
+          />
+        </div>
+
+        <CardHeader className="flex flex-row items-start justify-between pb-4 space-y-0 relative z-10">
+          <div
+            className={cn(
+              "size-12 rounded-xl flex items-center justify-center border transition-colors",
+              style.iconBg
+            )}
+          >
+            <Image src={logo} alt={data.type} width={24} height={24} />
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              >
+                <MoreVerticalIcon className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DropdownMenuItem
+                onClick={handleRemove}
+                className="text-destructive focus:text-destructive cursor-pointer"
+              >
+                <TrashIcon className="size-4 mr-2" />
+                Delete Credential
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </CardHeader>
+
+        <CardContent className="flex-1 space-y-1.5 relative z-10">
+          <h3
+            className={cn(
+              "font-semibold text-lg leading-none tracking-tight",
+              style.text
+            )}
+          >
+            {data.name}
+          </h3>
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            Secure API configuration for {data.type.toLowerCase()}.
+          </p>
+        </CardContent>
+
+        <CardFooter className="pt-4 border-t bg-muted/10 text-xs text-muted-foreground flex justify-between items-center mt-auto relative z-10 backdrop-blur-[1px]">
+          <div className="flex items-center gap-1.5">
+            <CalendarIcon className="size-3.5" />
+            <span>
+              {formatDistanceToNow(data.createdAt, { addSuffix: true })}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <ShieldCheckIcon className="size-3" />
+            Active
+          </div>
+        </CardFooter>
+      </Card>
+    </motion.div>
+  );
+};
+
 export const CredentialsContainer = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
   return (
-    <EntityContainer
-      header={<CredentialsHeader />}
-      search={<></>}
-      pagination={<CredentialsPagination />}
-    >
+    <div className="flex flex-col min-h-[calc(100vh-100px)] p-6 md:p-8 w-full">
       {children}
-    </EntityContainer>
+    </div>
   );
 };
 
-export const CredentialsLoading = () => {
-  return <LoadingView message="Loading credentials..." />;
-};
-
-export const CredentialsError = () => {
-  return <ErrorView message="Error loading credentials" />;
-};
+export const CredentialsLoading = () => (
+  <LoadingView message="Loading credentials..." />
+);
+export const CredentialsError = () => (
+  <ErrorView message="Error loading credentials" />
+);
 
 export const CredentialsEmpty = () => {
-  const router = useRouter();
-
-  const handleCreate = () => {
-    router.push(`/credentials/new`);
-  };
-
   return (
-    <EmptyView2
-      message="You haven't created any credentials yet. Get started by creating your first credential."
-      onNew={handleCreate}
-    />
-  );
-};
-
-const CredentialLogos: Record<CredentialType, string> = {
-  [CredentialType.OPENAI]: "/logos/openai.svg",
-  [CredentialType.ANTHROPIC]: "/logos/anthropic.svg",
-  [CredentialType.GEMINI]: "/logos/gemini.svg",
-};
-
-export const CredentialItem = ({ data }: { data: Credential }) => {
-  const removeCredential = useRemoveCredential();
-
-  const handleRemove = () => {
-    removeCredential.mutate({ id: data.id });
-  };
-
-  const logo = CredentialLogos[data.type] || "/logos/openai.svg";
-
-  return (
-    <EntityItem
-      key={data.id}
-      href={`/credentials/${data.id}`}
-      title={data.name}
-      subtitle={
-        <>
-          Updated {formatDistanceToNow(data.updatedAt, { addSuffix: true })}{" "}
-          &bull; Created{" "}
-          {formatDistanceToNow(data.createdAt, { addSuffix: true })}
-        </>
-      }
-      image={
-        <div className="size-8 flex items-center justify-center">
-          <Image src={logo} alt={data.type} width={20} height={20} />
+    <>
+      <div className="flex min-h-[400px] max-w-[85vw] m-18 flex-col items-center justify-center rounded-lg border border-dashed bg-background p-8 text-center animate-in fade-in-50">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+          <WorkflowIcon className="h-10 w-10 text-muted-foreground" />
         </div>
-      }
-      onRemove={handleRemove}
-      isRemoving={removeCredential.isPending}
-    />
+        <h3 className="mt-4 text-lg font-semibold">No workflows created</h3>
+        <p className="mb-4 mt-2 text-sm text-muted-foreground max-w-sm">
+          You haven't created any workflows yet. Start automating your tasks by
+          creating your first workflow.
+        </p>
+        <Button
+          asChild
+          className="h-9 shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          <Link href="/credentials/new">
+            <PlusIcon className="mr-2 size-4" />
+            Add New
+          </Link>
+        </Button>
+      </div>
+    </>
   );
 };
