@@ -4,7 +4,6 @@ import z from "zod";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -34,6 +33,18 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
 import { CredentialType } from "@prisma/client";
+import {
+  Bot,
+  Cpu,
+  Fingerprint,
+  KeyRound,
+  Layers,
+  Sparkles,
+  Terminal,
+  Variable,
+  Wand2,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export type AnthropicFormValues = z.infer<typeof formSchema>;
 
@@ -52,7 +63,6 @@ const AVAILABLE_MODELS = [
   "claude-3-7-sonnet-latest",
   "claude-haiku-4-5",
   "claude-3-5-haiku-latest",
-  "claude-haiku-4-5",
 ] as const;
 
 const formSchema = z.object({
@@ -89,7 +99,6 @@ export const AnthropicDialog = ({
     },
   });
 
-  // Reset form values when dialog opens with new defaults
   useEffect(() => {
     if (open) {
       form.reset({
@@ -102,7 +111,7 @@ export const AnthropicDialog = ({
     }
   }, [open, defaultValues, form]);
 
-  const watchVariableName = form.watch("variableName") || "myAnthropic";
+  const watchVariableName = form.watch("variableName") || "anthropicOutput";
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     onSubmit(values);
@@ -111,153 +120,271 @@ export const AnthropicDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Anthropic Configuration</DialogTitle>
-          <DialogDescription>
-            Configure the AI model and prompts for this node.
-          </DialogDescription>
+      <DialogContent className="min-w-[40vw] p-0 gap-0 overflow-hidden outline-none bg-background shadow-2xl border-border/50">
+        <DialogHeader className="p-6 border-b border-border/50 bg-muted/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-xl bg-linear-to-br from-orange-500/10 to-amber-500/10 flex items-center justify-center border border-orange-500/20 shadow-inner">
+                <Image
+                  src="/logos/anthropic.svg"
+                  alt="Anthropic"
+                  width={22}
+                  height={22}
+                  className="opacity-90"
+                />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <DialogTitle className="text-lg font-semibold tracking-tight text-foreground">
+                    Anthropic Configuration
+                  </DialogTitle>
+                  <Badge
+                    variant="secondary"
+                    className="h-5 px-1.5 text-[10px] bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20"
+                  >
+                    AI GENERATION
+                  </Badge>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  Configure Claude models & prompts
+                </span>
+              </div>
+            </div>
+          </div>
         </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-8 mt-4"
-          >
-            <FormField
-              control={form.control}
-              name="variableName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Variable Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="myAnthropic" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Use this name to reference the result in other nodes:{" "}
-                    {`{{${watchVariableName}.text}}`}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="model"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Model</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a model" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {AVAILABLE_MODELS.map((model) => (
-                        <SelectItem key={model} value={model}>
-                          {model}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Select the model to use for this node.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="credentialId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Anthropic Credential</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={isLoadingCredentials || !credentials?.length}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a credential" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {credentials?.map((credential) => (
-                        <SelectItem key={credential.id} value={credential.id}>
-                          <div className="flex items-center gap-2">
-                            <Image
-                              src="/logos/anthropic.svg"
-                              alt="Anthropic"
-                              width={16}
-                              height={16}
-                            />
-                            {credential.name}
+
+        <div className="max-h-[65vh] overflow-y-auto custom-scrollbar">
+          <Form {...form}>
+            <form
+              id="anthropic-node-form"
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="p-6 space-y-8"
+            >
+              {/* Output Configuration */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+                  <Layers className="size-4 text-muted-foreground" />
+                  <span>Output Configuration</span>
+                </div>
+                <div className="p-4 rounded-xl border border-border/50 bg-card shadow-sm">
+                  <FormField
+                    control={form.control}
+                    name="variableName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                          Variable Name
+                        </FormLabel>
+                        <div className="flex items-center gap-3">
+                          <FormControl>
+                            <div className="relative flex-1">
+                              <Variable className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                              <Input
+                                placeholder="anthropicOutput"
+                                {...field}
+                                className="pl-9 font-mono bg-muted/30 focus:bg-background transition-all"
+                              />
+                            </div>
+                          </FormControl>
+                          <div className="hidden sm:flex items-center h-10 px-3 rounded-md bg-muted/50 border border-border/50 text-xs text-muted-foreground font-mono whitespace-nowrap">
+                            <Terminal className="size-3 mr-2 opacity-50" />
+                            {`{{${watchVariableName}.text}}`}
                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Select the credential to use for this node.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="systemPrompt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>System Prompt (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="You are a helpful assistant."
-                      className="min-h-[80px] font-mono text-sm"
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Model Settings */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+                  <Cpu className="size-4 text-muted-foreground" />
+                  <span>Model Settings</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border border-border/50 bg-card shadow-sm">
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                          Model Version
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full bg-muted/30 focus:bg-background transition-all">
+                              <SelectValue placeholder="Select Model" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {AVAILABLE_MODELS.map((model) => (
+                              <SelectItem key={model} value={model}>
+                                <div className="flex items-center gap-2">
+                                  <Sparkles className="size-3.5 text-orange-500" />
+                                  <span>{model}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="credentialId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                          Credential
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={
+                            isLoadingCredentials || !credentials?.length
+                          }
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full bg-muted/30 focus:bg-background transition-all">
+                              <SelectValue placeholder="Select Key" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {credentials?.map((credential) => (
+                              <SelectItem
+                                key={credential.id}
+                                value={credential.id}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <KeyRound className="size-3.5 text-orange-500" />
+                                  <span className="truncate max-w-[200px]">
+                                    {credential.name}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Prompt Engineering */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+                    <Wand2 className="size-4 text-muted-foreground" />
+                    <span>Prompt Engineering</span>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] font-normal h-5"
+                  >
+                    Supports Handlebars
+                  </Badge>
+                </div>
+
+                <div className="rounded-xl border border-border/50 bg-card shadow-sm divide-y divide-border/50 overflow-hidden">
+                  {/* System Prompt */}
+                  <div className="p-4 bg-muted/10">
+                    <FormField
+                      control={form.control}
+                      name="systemPrompt"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center justify-between text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+                            <span>System Prompt</span>
+                            <span className="text-[10px] font-normal opacity-70">
+                              Optional
+                            </span>
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Bot className="absolute top-3 left-3 size-4 text-muted-foreground/60" />
+                              <Textarea
+                                {...field}
+                                placeholder="You are a helpful AI assistant..."
+                                className="min-h-[80px] pl-9 font-mono text-sm bg-background border-muted resize-none focus:ring-1 focus:ring-orange-500/20"
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </FormControl>
-                  <FormDescription>
-                    Sets the behavior of the assistant. Use {"{{variables}}"}{" "}
-                    for simple values or {"{{json variable}}"} to stringify
-                    objects
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="userPrompt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>User Prompt</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Summarize the following text: {{httpResponse.data}}"
-                      className="min-h-[120px] font-mono text-sm"
+                  </div>
+
+                  {/* User Prompt */}
+                  <div className="p-4">
+                    <FormField
+                      control={form.control}
+                      name="userPrompt"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2 block">
+                            User Prompt
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative group">
+                              <div className="absolute top-3 left-3 pointer-events-none">
+                                <Fingerprint className="size-4 text-muted-foreground/60" />
+                              </div>
+                              <Textarea
+                                {...field}
+                                placeholder="Summarize the following text: {{http.data}}"
+                                className="min-h-[160px] pl-9 font-mono text-sm bg-muted/20 focus:bg-background border-muted transition-colors resize-y focus:ring-1 focus:ring-orange-500/20"
+                              />
+                            </div>
+                          </FormControl>
+                          <FormDescription className="flex items-center gap-1.5 mt-2 text-[11.5px] text-muted-foreground">
+                            <Sparkles className="size-3 text-orange-500" />
+                            <span>
+                              Type{" "}
+                              <code className="text-primary bg-muted px-1 py-0.5 rounded">
+                                {"{{variable}}"}
+                              </code>{" "}
+                              to insert variables.
+                            </span>
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </FormControl>
-                  <FormDescription>
-                    The prompt to send to the AI. Use {"{{variables}}"}
-                    for simple values or {"{{json variable}}"} to stringify
-                    objects
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <DialogFooter className="mt-4">
-              <Button type="submit">Save</Button>
-            </DialogFooter>
-          </form>
-        </Form>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </Form>
+        </div>
+
+        <DialogFooter className="p-4 border-t border-border/50 bg-muted/20 flex items-center gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => onOpenChange(false)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            form="anthropic-node-form"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 shadow-sm"
+          >
+            Save Configuration
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
