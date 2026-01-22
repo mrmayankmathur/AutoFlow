@@ -135,7 +135,7 @@ export const WorkflowCard = ({ data }: { data: Workflow }) => {
         )}
       />
 
-      <CardHeader className="relative -mt-10 pb-2">
+      <CardHeader className="relative -mt-10 -mb-2">
         <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-background shadow-sm">
           <WorkflowIcon className="h-6 w-6 text-muted-foreground" />
         </div>
@@ -152,42 +152,44 @@ export const WorkflowCard = ({ data }: { data: Workflow }) => {
         </p>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between border-t bg-muted/20 px-6 py-3">
-        <div className="text-xs text-muted-foreground">
+      <CardFooter className="flex items-center justify-between border-t bg-muted/20 px-6 pb-3">
+        <div className="text-xs text-muted-foreground -mt-2">
           Edited {formatDistanceToNow(data.updatedAt)} ago
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 -mr-2 text-muted-foreground hover:text-foreground"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                router.push(`/workflows/${data.id}`);
-              }}
-            >
-              <Play className="mr-2 h-4 w-4" /> Open
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive"
-              onClick={handleRemove}
-              disabled={removeWorkflow.isPending}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="-mt-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 -mr-2 text-muted-foreground hover:text-foreground"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/workflows/${data.id}`);
+                }}
+              >
+                <Play className="mr-2 h-4 w-4" /> Open
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onClick={handleRemove}
+                disabled={removeWorkflow.isPending}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </CardFooter>
     </Card>
   );

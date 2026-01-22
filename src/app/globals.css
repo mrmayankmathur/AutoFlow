@@ -145,3 +145,17 @@
   animation-play-state: paused;
   cursor: pointer; /* Optional: Changes cursor to hand so user knows it's interactive */
 }
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 200%;
+  }
+}
+
+.animate-gradient-shift {
+  background-size: 200%; /* Makes the gradient double the width of the container */
+  animation: gradient-shift 1.5s linear infinite; /* Linear is key for smooth looping */
+}
