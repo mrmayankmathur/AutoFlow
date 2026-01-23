@@ -38,6 +38,7 @@ import {
 } from "@/features/workflows/hooks/use-workflows";
 import { useAtomValue } from "jotai";
 import { editorAtom } from "../store/atoms";
+import { toast } from "sonner";
 
 type Props = {
   workflowId: string;
@@ -114,7 +115,7 @@ export const EditorNameInput = ({ workflowId }: Props) => {
         name: trimmedName,
       });
     } catch (error) {
-      // TODO: Show toast/alert with error message
+      toast.error(`Failed to update workflow name: ${error}`);
       console.error("Failed to update workflow name:", error);
       setName(workflow.name);
     } finally {
