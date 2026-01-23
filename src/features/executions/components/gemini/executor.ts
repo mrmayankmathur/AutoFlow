@@ -119,8 +119,8 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
 
     if (!text) {
       console.warn(
-        "Gemini Executor: No text generated. Steps received:",
-        JSON.stringify(steps, null, 2)
+        "Gemini Executor: No text generated.",
+        `Steps count: ${steps?.length ?? 0}, First step content types: ${steps?.[0]?.content?.map((c: { type: string }) => c.type).join(", ") ?? "none"}`
       );
     }
 
