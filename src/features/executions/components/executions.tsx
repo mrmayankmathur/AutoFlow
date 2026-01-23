@@ -65,10 +65,17 @@ const StatusBadge = ({ status }: { status: ExecutionStatus }) => {
 const DurationDisplay = ({ start, end }: { start: Date; end: Date | null }) => {
   if (!end) return <span className="text-muted-foreground">-</span>;
 
-  const seconds = Math.round((end.getTime() - start.getTime()) / 1000);
+  const totalSeconds = Math.round((end.getTime() - start.getTime()) / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
 
   let text = `${seconds}s`;
-  if (seconds > 60) text = `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+  if (hours > 0) {
+    text = `${hours}h ${minutes}m ${seconds}s`;
+  } else if (minutes > 0) {
+    text = `${minutes}m ${seconds}s`;
+  }
 
   return (
     <div className="flex items-center text-sm text-slate-600 dark:text-[#B0B0B1]">
@@ -192,20 +199,19 @@ export const ExecutionsContainer = ({
 };
 
 export const ExecutionsLoading = () => {
-  // A simple skeleton loader for the table
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
-      <div className="h-20 bg-slate-100 rounded-md w-1/3 animate-pulse mb-8" />
-      <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
-        <div className="bg-slate-50/50 h-10 border-b border-slate-200" />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-4">
+      <div className="h-20 bg-slate-100 dark:bg-slate-800 rounded-md w-1/3 animate-pulse mb-8" />
+      <div className="border border-slate-200 dark:border-[#393939] rounded-xl overflow-hidden bg-white dark:bg-[#282828]">
+        <div className="bg-slate-50/50 dark:bg-[#282828] h-10 border-b border-slate-200 dark:border-[#393939]" />
         {[1, 2, 3, 4, 5].map((i) => (
           <div
             key={i}
-            className="h-20 border-b border-slate-100 p-4 flex items-center space-x-4"
+            className="h-20 border-b border-slate-100 dark:border-[#393939] p-4 flex items-center space-x-4"
           >
-            <div className="h-4 bg-slate-100 rounded w-1/4 animate-pulse" />
-            <div className="h-4 bg-slate-100 rounded w-1/6 animate-pulse" />
-            <div className="h-4 bg-slate-100 rounded w-1/6 animate-pulse" />
+            <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded w-1/4 animate-pulse" />
+            <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded w-1/6 animate-pulse" />
+            <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded w-1/6 animate-pulse" />
           </div>
         ))}
       </div>

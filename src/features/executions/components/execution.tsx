@@ -59,9 +59,14 @@ const GetStatusIcon = ({ status }: { status: ExecutionStatus }) => {
 };
 
 const GetStatusBadge = ({ status }: { status: ExecutionStatus }) => {
-  const variants: Record<
-    ExecutionStatus,
-    { variant: string; className: string }
+  const variants: Partial<
+    Record<
+      ExecutionStatus,
+      {
+        variant: "default" | "destructive" | "outline" | "secondary";
+        className: string;
+      }
+    >
   > = {
     [ExecutionStatus.SUCCESS]: {
       variant: "default",
@@ -80,17 +85,17 @@ const GetStatusBadge = ({ status }: { status: ExecutionStatus }) => {
     },
   };
 
-  const config = variants[status];
+  const config = variants[status] ?? {
+    variant: "secondary",
+    className:
+      "bg-slate-100 text-slate-800 hover:bg-slate-200 border-slate-200 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900 dark:border-slate-800",
+  };
 
   return (
-    <Badge className={config.className}>
+    <Badge variant={config.variant} className={config.className}>
       {status.charAt(0) + status.slice(1).toLowerCase()}
     </Badge>
   );
-};
-
-const FormatStatus = (status: ExecutionStatus) => {
-  return status.charAt(0) + status.slice(1).toLowerCase();
 };
 
 const CopyButton = ({ text }: { text: string }) => {
@@ -118,6 +123,20 @@ const CopyButton = ({ text }: { text: string }) => {
   );
 };
 
+const formatDuration = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${remainingSeconds}s`;
+  } else if (minutes > 0) {
+    return `${minutes}m ${remainingSeconds}s`;
+  } else {
+    return `${remainingSeconds}s`;
+  }
+};
+
 export const ExecutionView = ({ executionId }: { executionId: string }) => {
   const { data: execution } = useSuspenseExecution(executionId);
   const [showStackTrace, setShowStackTrace] = useState(false);
@@ -129,16 +148,8 @@ export const ExecutionView = ({ executionId }: { executionId: string }) => {
       )
     : null;
 
-  const formatDuration = (seconds: number) => {
-    if (seconds < 60) return `${seconds}s`;
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds}s`;
-  };
-
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Header Section */}
       <div className="flex items-center justify-between">
         <Button
           variant="ghost"
@@ -181,7 +192,6 @@ export const ExecutionView = ({ executionId }: { executionId: string }) => {
         </CardHeader>
 
         <CardContent className="space-y-6 pt-2">
-          {/* Execution Metrics Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 rounded-lg border bg-linear-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 dark:border-slate-700">
               <div className="flex items-center gap-3 mb-2">
@@ -268,7 +278,6 @@ export const ExecutionView = ({ executionId }: { executionId: string }) => {
             </code>
           </div>
 
-          {/* Error Section */}
           {execution.error && (
             <div className="rounded-lg border-2 border-rose-200 dark:border-rose-900 bg-linear-to-br from-rose-50 to-red-50 dark:from-rose-950/30 dark:to-red-950/30 overflow-hidden">
               <div className="p-4 bg-rose-100/50 dark:bg-rose-950/50 border-b border-rose-200 dark:border-rose-900">
@@ -335,7 +344,6 @@ export const ExecutionView = ({ executionId }: { executionId: string }) => {
             </div>
           )}
 
-          {/* Output Section */}
           {execution.output && (
             <div className="rounded-lg border-2 border-emerald-200 dark:border-emerald-900 bg-linear-to-br from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 overflow-hidden">
               <div className="p-4 bg-emerald-100/50 dark:bg-emerald-950/50 border-b border-emerald-200 dark:border-emerald-900">
@@ -377,12 +385,10 @@ export const ExecutionLoading = () => {
         <div className="h-full w-full bg-[linear-gradient(to_right,var(--color-blue-500),var(--color-purple-500),var(--color-pink-500),var(--color-blue-500))] animate-gradient-shift" />
       </div>
       <div className="space-y-6 animate-in fade-in duration-500">
-        {/* Header Section Skeleton */}
         <div className="flex items-center justify-between">
           <Skeleton className="h-9 w-20" />
         </div>
 
-        {/* Main Card Skeleton */}
         <Card className="border-2 shadow-lg shadow-slate-200/50 dark:shadow-slate-950/50 overflow-hidden">
           <CardHeader className="pb-4 pt-8 space-y-4">
             <div className="flex items-start justify-between">
@@ -400,7 +406,6 @@ export const ExecutionLoading = () => {
           </CardHeader>
 
           <CardContent className="space-y-6 pt-2">
-            {/* Metrics Grid Skeleton */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[...Array(4)].map((_, i) => (
                 <div
@@ -417,13 +422,11 @@ export const ExecutionLoading = () => {
               ))}
             </div>
 
-            {/* Event ID Section Skeleton */}
             <div className="p-4 rounded-lg border bg-slate-50 dark:bg-slate-900 dark:border-slate-700">
               <Skeleton className="h-4 w-16 mb-2" />
               <Skeleton className="h-7 w-full max-w-md" />
             </div>
 
-            {/* Optional Error/Output Section Skeleton (50% chance to show) */}
             <div className="rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 overflow-hidden">
               <div className="p-4 bg-slate-100/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center gap-3">

@@ -156,6 +156,12 @@
 }
 
 .animate-gradient-shift {
-  background-size: 200%; /* Makes the gradient double the width of the container */
-  animation: gradient-shift 1.5s linear infinite; /* Linear is key for smooth looping */
+  background-size: 200%;
+  animation: gradient-shift 1.5s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-gradient-shift {
+    animation: none;
+  }
 }
