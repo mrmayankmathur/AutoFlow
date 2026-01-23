@@ -17,7 +17,7 @@ const Page = async ({ params }: pageProps) => {
   await requireAuth();
 
   const { credentialId } = await params;
-  await prefetchCredential(credentialId);
+  prefetchCredential(credentialId);
 
   return (
     <div className="min-h-[calc(100vh-72px)] w-full bg-linear-to-br from-background to-muted/40">
