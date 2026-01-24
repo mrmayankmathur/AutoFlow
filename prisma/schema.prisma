@@ -123,6 +123,7 @@ enum NodeType {
   GEMINI
   DISCORD
   SLACK
+  AI_CLASSIFIER
 }
 
 model Node {

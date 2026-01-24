@@ -14,6 +14,12 @@ export interface NodeExecutorParams<TData = Record<string, unknown>> {
   publish: Realtime.PublishFn;
 }
 
+export type ExecutionResult = {
+  context: WorkflowContext;
+  nextHandle?: string;
+  stop?: boolean;
+};
+
 export type NodeExecutor<TData = Record<string, unknown>> = (
   params: NodeExecutorParams<TData>
-) => Promise<WorkflowContext>;
+) => Promise<ExecutionResult | WorkflowContext>;
