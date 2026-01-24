@@ -62,7 +62,7 @@ const formSchema = z.object({
   routes: z
     .array(
       z.object({
-        id: z.string(),
+        id: z.string().min(1, "Route ID is required"),
         label: z.string().min(1, "Label is required"),
       })
     )
@@ -79,17 +79,19 @@ interface AiClassifierDialogProps {
   defaultValues?: Partial<AiClassifierFormValues>;
 }
 
-// Define available models grouped by provider
 const MODEL_OPTIONS = {
   [CredentialType.GEMINI]: [
     { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
     { value: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
-    { value: "gemini-3-flash-preview", label: "Gemini 3 Flash Preview" },
+    { value: "gemini-3-flash-preview", label: "Gemini 3 Flash" },
+    { value: "gemini-3-pro-preview", label: "Gemini 3 Pro" },
   ],
   [CredentialType.OPENAI]: [
+    { value: "gpt-4", label: "GPT-4" },
     { value: "gpt-4o", label: "GPT-4o" },
     { value: "gpt-4o-mini", label: "GPT-4o Mini" },
     { value: "gpt-4.1", label: "GPT-4.1" },
+    { value: "gpt-4.1-mini", label: "GPT-4.1 Mini" },
   ],
 };
 
@@ -115,14 +117,13 @@ export function AiClassifierDialog({
     },
   });
 
-  // Watch the credential ID to filter models
   const selectedCredentialId = form.watch("credentialId");
   const watchVariableName = form.watch("variableName") || "classification";
 
-  // Reset form when dialog opens
   useEffect(() => {
     if (open) {
-      form.reset({
+      const currentValues = form.getValues();
+      const newValues = {
         variableName: "",
         credentialId: "",
         model: "",
@@ -132,9 +133,13 @@ export function AiClassifierDialog({
         ],
         input: "",
         ...defaultValues,
-      });
+      };
+
+      if (JSON.stringify(currentValues) !== JSON.stringify(newValues)) {
+        form.reset(newValues);
+      }
     }
-  }, [open, defaultValues, form]);
+  }, [open, JSON.stringify(defaultValues), form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -152,7 +157,6 @@ export function AiClassifierDialog({
     );
   }, [credentials]);
 
-  // Determine which models to show based on selected credential
   const availableModels = useMemo(() => {
     if (!selectedCredentialId || !filteredCredentials) return [];
 
@@ -162,13 +166,11 @@ export function AiClassifierDialog({
 
     if (!selectedCredential) return [];
 
-    // Return models specific to the credential type (GEMINI or OPENAI)
     return (
       MODEL_OPTIONS[selectedCredential.type as keyof typeof MODEL_OPTIONS] || []
     );
   }, [selectedCredentialId, filteredCredentials]);
 
-  // Automatically select the first available model when credential changes
   useEffect(() => {
     if (availableModels.length > 0) {
       const currentModel = form.getValues("model");
@@ -185,7 +187,6 @@ export function AiClassifierDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="min-w-[45vw] p-0 gap-0 overflow-hidden outline-none bg-background shadow-2xl border-border/50">
-        {/* Header */}
         <DialogHeader className="p-6 border-b border-border/50 bg-muted/20">
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-xl bg-linear-to-br from-indigo-500/10 to-blue-500/10 flex items-center justify-center border border-indigo-500/20 shadow-inner">
@@ -210,7 +211,6 @@ export function AiClassifierDialog({
           </div>
         </DialogHeader>
 
-        {/* Scrollable Content */}
         <div className="max-h-[65vh] overflow-y-auto custom-scrollbar">
           <Form {...form}>
             <form
@@ -218,7 +218,6 @@ export function AiClassifierDialog({
               onSubmit={form.handleSubmit(onSubmit)}
               className="p-6 space-y-8"
             >
-              {/* Output Configuration */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                   <Layers className="size-4 text-muted-foreground" />
@@ -256,7 +255,6 @@ export function AiClassifierDialog({
                 </div>
               </div>
 
-              {/* AI & Model Configuration */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                   <BrainCircuit className="size-4 text-muted-foreground" />
@@ -274,9 +272,8 @@ export function AiClassifierDialog({
                         <Select
                           onValueChange={(val) => {
                             field.onChange(val);
-                            // Model will be reset by the useEffect above
                           }}
-                          defaultValue={field.value}
+                          value={field.value}
                           disabled={isLoadingCredentials}
                         >
                           <FormControl>
@@ -285,6 +282,12 @@ export function AiClassifierDialog({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
+                            {(!filteredCredentials ||
+                              filteredCredentials.length === 0) && (
+                              <div className="py-2 px-3 text-sm text-muted-foreground">
+                                No Gemini or OpenAI credentials found
+                              </div>
+                            )}
                             {filteredCredentials?.map((credential) => (
                               <SelectItem
                                 key={credential.id}
@@ -356,7 +359,6 @@ export function AiClassifierDialog({
                 </div>
               </div>
 
-              {/* Classification Input */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                   <Tag className="size-4 text-muted-foreground" />
@@ -392,7 +394,6 @@ export function AiClassifierDialog({
                 </div>
               </div>
 
-              {/* Routing Logic */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
@@ -421,7 +422,6 @@ export function AiClassifierDialog({
                       key={field.id}
                       className="group flex gap-3 items-start relative animate-in slide-in-from-left-2 fade-in duration-300"
                     >
-                      {/* Connection Line Visual */}
                       <div className="absolute -left-[20px] top-5 w-[12px] h-px bg-border/50 hidden md:block" />
 
                       <FormField
@@ -469,7 +469,9 @@ export function AiClassifierDialog({
                         variant="ghost"
                         size="icon"
                         onClick={() => remove(index)}
-                        className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                        disabled={fields.length === 1}
+                        aria-label={`Remove route ${fields[index]?.label || index + 1}`}
+                        className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Trash2 className="size-4" />
                       </Button>
@@ -481,7 +483,6 @@ export function AiClassifierDialog({
           </Form>
         </div>
 
-        {/* Footer */}
         <DialogFooter className="p-4 border-t border-border/50 bg-muted/20 flex items-center gap-2">
           <Button
             variant="ghost"

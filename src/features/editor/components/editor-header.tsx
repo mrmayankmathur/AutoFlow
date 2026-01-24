@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Book, Headphones, Loader2Icon, SaveIcon } from "lucide-react";
+import { NodeType } from "@prisma/client";
 import { Input } from "@/components/ui/input";
 import {
   Tooltip,
@@ -57,8 +58,10 @@ export const EditorSaveButton = ({ workflowId }: Props) => {
     saveWorkflow.mutate({
       id: workflowId,
       nodes: nodes.map((node) => ({
-        ...node,
-        type: node.type as any,
+        id: node.id,
+        type: node.type as NodeType,
+        position: node.position,
+        data: node.data,
       })),
       edges,
     });

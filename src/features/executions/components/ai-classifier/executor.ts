@@ -33,7 +33,12 @@ export const aiClassifierExecutor: NodeExecutor<AiClassifierData> = async ({
     })
   );
 
-  if (!data.variableName || !data.credentialId || !data.routes || !data.input) {
+  if (
+    !data.variableName ||
+    !data.credentialId ||
+    !data.routes?.length ||
+    !data.input
+  ) {
     await publish(
       aiClassifierChannel().status({
         nodeId,
@@ -89,7 +94,7 @@ Provide a reasoning for your choice and a confidence score (0-1).`;
     model = google(data.model || "gemini-2.5-flash");
   } else if (credential.type === CredentialType.OPENAI) {
     const openai = createOpenAI({
-      apiKey: decrypt(credential.value),
+      apiKey: credentialValue,
       baseURL: "https://models.github.ai/inference",
     });
     model = openai.chat(data.model || "gpt-4.1");
@@ -103,8 +108,10 @@ Provide a reasoning for your choice and a confidence score (0-1).`;
     throw new NonRetriableError("SMART ROUTER: Unsupported credential type");
   }
 
+  type RouterOutput = z.infer<typeof routerSchema>;
+
   try {
-    const { object } = (await step.ai.wrap(
+    const result = (await step.ai.wrap(
       "smart-router-decision",
       generateObject,
       {
@@ -119,7 +126,9 @@ Provide a reasoning for your choice and a confidence score (0-1).`;
           recordOutputs: true,
         },
       }
-    )) as any;
+    )) as unknown as { object: RouterOutput };
+
+    const { object } = result;
 
     const match = routes.find((r) => r.id === object.routeId);
 
@@ -139,7 +148,7 @@ Provide a reasoning for your choice and a confidence score (0-1).`;
       context: {
         ...context,
         [data.variableName]: {
-          ...(object as Record<string, unknown>),
+          ...object,
           selectedLabel: match?.label || "Default",
           originalText: input,
         },

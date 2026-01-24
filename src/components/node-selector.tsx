@@ -85,7 +85,7 @@ const executionNodes: NodeTypeOption[] = [
     type: NodeType.AI_CLASSIFIER,
     label: "AI Classifier",
     description: "Classifies text into categories using AI.",
-    icon: "/logos/gemini.svg",
+    icon: "/logos/aiClassifier.png",
   },
 ];
 

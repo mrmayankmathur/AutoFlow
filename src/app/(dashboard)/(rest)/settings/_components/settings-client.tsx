@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 import { User as PrismaUser } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { AccountSettings } from "./account-settings";
+import { NotificationsSettings } from "./notifications-settings";
+import { PrivacySettings } from "./privacy-settings";
 
 type Props = {
   user: PrismaUser | null;
@@ -66,7 +69,7 @@ export const SettingsClient = ({
   ] as const;
 
   return (
-    <div className="h-[calc(100vh-72px)]! bg-[#F4F2EE] dark:bg-[#080808] pb-20">
+    <div className="lg:h-[calc(100vh-72px)]! bg-[#F4F2EE] dark:bg-[#080808] pb-20">
       <div className="-ml-1 md:ml-0 mx-auto w-full p-6 md:p-10">
         {/* Page Header */}
         <div className="mb-8 flex items-center gap-2">
@@ -170,12 +173,10 @@ export const SettingsClient = ({
                     Account
                   </h2>
                   <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">
-                    Manage your account settings.
+                    Manage your account settings and active sessions.
                   </p>
                 </div>
-                <div className="h-40 flex items-center justify-center text-muted-foreground border border-dashed border-[#404040] rounded-xl">
-                  Account settings coming soon
-                </div>
+                <AccountSettings />
               </div>
             )}
 
@@ -183,15 +184,13 @@ export const SettingsClient = ({
               <div className="bg-white dark:bg-[#1F212B] rounded-3xl p-8 shadow-sm border border-neutral-200/60 dark:border-neutral-800">
                 <div className="mb-6">
                   <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
-                    Notifications
+                    Notifications & Activity
                   </h2>
                   <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">
-                    Configure how you receive notifications.
+                    View recent workflow activity and alerts.
                   </p>
                 </div>
-                <div className="h-40 flex items-center justify-center text-muted-foreground border border-dashed border-[#404040] rounded-xl">
-                  Notification settings coming soon
-                </div>
+                <NotificationsSettings />
               </div>
             )}
 
@@ -199,15 +198,13 @@ export const SettingsClient = ({
               <div className="bg-white dark:bg-[#1F212B] rounded-3xl p-8 shadow-sm border border-neutral-200/60 dark:border-neutral-800">
                 <div className="mb-6">
                   <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
-                    Privacy
+                    Privacy & Security
                   </h2>
                   <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">
-                    Manage your privacy and security settings.
+                    Review how your data is protected.
                   </p>
                 </div>
-                <div className="h-40 flex items-center justify-center text-muted-foreground border border-dashed border-[#404040] rounded-xl">
-                  Privacy settings coming soon
-                </div>
+                <PrivacySettings />
               </div>
             )}
           </div>

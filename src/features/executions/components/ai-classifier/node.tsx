@@ -6,7 +6,7 @@ import {
   type NodeProps,
   Position,
 } from "@xyflow/react";
-import { memo, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { BaseExecutionNode } from "../base-execution-node";
 import { AiClassifierFormValues, AiClassifierDialog } from "./dialog";
 import { useNodeStatus } from "../../hooks/use-node-status";
@@ -36,27 +36,30 @@ export const AiClassifierNode = memo(
         ? `Router: ${routes.map((r) => r.label).join(", ")}`
         : "Not configured";
 
-    const handleSubmit = (values: AiClassifierFormValues) => {
-      setNodes((nodes) =>
-        nodes.map((node) => {
-          if (node.id === props.id) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                ...values,
-              },
-            };
-          }
-          return node;
-        })
-      );
-      setDialogOpen(false);
-    };
+    const handleSubmit = useCallback(
+      (values: AiClassifierFormValues) => {
+        setNodes((nodes) =>
+          nodes.map((node) => {
+            if (node.id === props.id) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  ...values,
+                },
+              };
+            }
+            return node;
+          })
+        );
+        setDialogOpen(false);
+      },
+      [props.id, setNodes]
+    );
 
-    const handleOpenSettings = () => {
+    const handleOpenSettings = useCallback(() => {
       setDialogOpen(true);
-    };
+    }, []);
 
     const nodeStatus = useNodeStatus({
       nodeId: props.id,
@@ -76,7 +79,7 @@ export const AiClassifierNode = memo(
         <BaseExecutionNode
           {...props}
           id={props.id}
-          icon="/logos/gemini.svg"
+          icon="/logos/aiClassifier.png"
           name="Smart Router"
           description={description}
           status={nodeStatus.status}
@@ -84,7 +87,6 @@ export const AiClassifierNode = memo(
           onDoubleClick={handleOpenSettings}
           hideSourceHandle={true}
         >
-          {/* Dynamic Handles for Routes */}
           <div className="flex flex-col gap-3 mt-2">
             {routes.map((route, index) => (
               <div
@@ -111,6 +113,8 @@ export const AiClassifierNode = memo(
                 id="source-1"
                 type="source"
                 position={Position.Right}
+                style={{ top: "50%" }}
+                className="bg-blue-500! border-blue-600!"
               />
             </div>
           </div>

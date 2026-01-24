@@ -1,7 +1,6 @@
 import { NonRetriableError } from "inngest";
 import { inngest } from "./client";
 import { prisma } from "@/lib/db";
-import { topologicalSort } from "./utils";
 import { ExecutionStatus, NodeType } from "@prisma/client";
 import { getExecutor } from "@/features/executions/lib/executor-registry";
 import { httpRequestChannel } from "./channels/http-request";
@@ -18,7 +17,6 @@ import { aiClassifierChannel } from "./channels/ai-classifier";
 export const executeWorkflow = inngest.createFunction(
   {
     id: "execute-workflow",
-    retries: 0, // TODO: Remove in production
     onFailure: async ({ event, step }) => {
       return prisma.execution.update({
         where: {
@@ -66,7 +64,7 @@ export const executeWorkflow = inngest.createFunction(
       });
     });
 
-    const { nodes, connections } = await step.run(
+    const { nodes, connections, userId } = await step.run(
       "fetch-workflow-data",
       async () => {
         return prisma.workflow.findUniqueOrThrow({
@@ -81,21 +79,8 @@ export const executeWorkflow = inngest.createFunction(
       }
     );
 
-    const { userId } = await step.run("get-user-id", async () => {
-      return prisma.workflow.findUniqueOrThrow({
-        where: { id: workflowId },
-        select: { userId: true },
-      });
-    });
-
-    // Initialize the context
     let context = event.data.initialData || {};
 
-    // --- Graph Traversal Engine ---
-    // 1. Find Entry Points (Triggers or Initial Node)
-    // In a real app, we might check which node *triggered* this execution.
-    // For now, we support Manual & Initial.
-    // Future: The 'event' could carry the triggerNodeId.
     const entryNodes = nodes.filter(
       (n) =>
         n.type === NodeType.MANUAL_TRIGGER ||
@@ -104,12 +89,8 @@ export const executeWorkflow = inngest.createFunction(
         n.type === NodeType.STRIPE_TRIGGER
     );
 
-    // Queue for BFS traversal
-    // We store the ID of the node to execute next
     const executionQueue: string[] = entryNodes.map((n) => n.id);
-    const visitedNodes = new Set<string>();
 
-    // Limits to prevent infinite loops (simple safety)
     let executionSteps = 0;
     const MAX_STEPS = 100;
 
@@ -124,10 +105,6 @@ export const executeWorkflow = inngest.createFunction(
 
       const currentNodeId = executionQueue.shift();
       if (!currentNodeId) break;
-
-      // In a more complex engine, we might allow revisiting nodes for loops,
-      // but for this v1 router upgrade, let's keep it simple or allow it.
-      // visitedNodes.add(currentNodeId);
 
       const node = nodes.find((n) => n.id === currentNodeId);
       if (!node) continue;
@@ -145,18 +122,13 @@ export const executeWorkflow = inngest.createFunction(
           publish,
         });
       } catch (err: any) {
-        // Log error to execution log DB?
-        // For now, rethrow to fail the step in Inngest
         throw err;
       }
 
-      // Handle Result
-      let nextHandle = "source-1"; // Default standard handle
+      let nextHandle = "source-1";
       let stop = false;
 
       if (executionResult && typeof executionResult === "object") {
-        // Check if it's the new ExecutionResult type (has 'nextHandle' or 'stop' or explicit 'context' property)
-        // We assume branching nodes return ExecutionResult shape
         const res = executionResult as any;
         if (
           "nextHandle" in res ||
@@ -173,27 +145,13 @@ export const executeWorkflow = inngest.createFunction(
             stop = true;
           }
         } else {
-          // Legacy support: it just returned context
           context = { ...context, ...executionResult };
         }
       }
 
       if (stop) {
-        continue; // Stop this branch
+        continue;
       }
-
-      // Find Next Node(s) based on Handle
-      // Look for connections where fromNodeId === currentNodeId AND fromOutput === nextHandle
-      console.log(
-        `[DEBUG] Node ${currentNodeId} executed. Next Handle: "${nextHandle}"`
-      );
-      const allOutgoing = connections.filter(
-        (c) => c.fromNodeId === currentNodeId
-      );
-      console.log(
-        `[DEBUG] Available outgoing connection handles:`,
-        allOutgoing.map((c) => `"${c.fromOutput}"`)
-      );
 
       const outgoingConnections = connections.filter(
         (c) => c.fromNodeId === currentNodeId && c.fromOutput === nextHandle
