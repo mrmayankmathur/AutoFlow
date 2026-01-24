@@ -1,13 +1,6 @@
 "use client";
 
-import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Lock, EyeOff, FileKey, Server } from "lucide-react";
 
 export const PrivacySettings = () => {
@@ -84,7 +77,15 @@ export const PrivacySettings = () => {
             </h4>
             <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
               AutoFlow adheres to strict security standards. For any security
-              concerns, please contact security@autoflow.ai.
+              concerns, please contact{" "}
+              <a
+                href="mailto:security@autoflow.ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-blue-800 dark:hover:text-blue-200"
+              >
+                security@autoflow.ai
+              </a>
             </p>
           </div>
         </div>

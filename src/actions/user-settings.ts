@@ -18,6 +18,22 @@ export async function getRecentExecutions(limit: number = 20) {
     throw new Error("Unauthorized");
   }
 
+  // Validate and sanitize limit
+  const MIN_LIMIT = 1;
+  const MAX_LIMIT = 100;
+  const DEFAULT_LIMIT = 20;
+
+  let sanitizedLimit = DEFAULT_LIMIT;
+  if (
+    typeof limit === "number" &&
+    Number.isFinite(limit) &&
+    Number.isInteger(limit)
+  ) {
+    sanitizedLimit = Math.max(MIN_LIMIT, Math.min(MAX_LIMIT, limit));
+  } else if (typeof limit !== "number") {
+    throw new Error("Invalid limit: must be a number");
+  }
+
   try {
     const executions = await prisma.execution.findMany({
       where: {
@@ -28,7 +44,7 @@ export async function getRecentExecutions(limit: number = 20) {
       orderBy: {
         startedAt: "desc",
       },
-      take: limit,
+      take: sanitizedLimit,
       include: {
         workflow: {
           select: {
@@ -108,8 +124,7 @@ export async function deleteAccount() {
       },
     });
 
-    // Auth cleanup if needed is automatic via DB trigger or session invalidation on next request
-    return { success: true };
+    redirect("/");
   } catch (error) {
     console.error("Failed to delete account:", error);
     return { success: false, error: "Failed to delete account" };

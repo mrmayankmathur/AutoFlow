@@ -111,29 +111,26 @@ Provide a reasoning for your choice and a confidence score (0-1).`;
   type RouterOutput = z.infer<typeof routerSchema>;
 
   try {
-    const result = (await step.ai.wrap(
-      "smart-router-decision",
-      generateObject,
-      {
-        model,
-        schema: routerSchema,
-        system: systemPrompt,
-        prompt: input,
-        temperature: 0.1,
-        experimental_telemetry: {
-          isEnabled: true,
-          recordInputs: true,
-          recordOutputs: true,
-        },
-      }
-    )) as unknown as { object: RouterOutput };
+    const result = await step.ai.wrap("smart-router-decision", generateObject, {
+      model,
+      schema: routerSchema,
+      system: systemPrompt,
+      prompt: input,
+      temperature: 0.1,
+      experimental_telemetry: {
+        isEnabled: true,
+        recordInputs: true,
+        recordOutputs: true,
+      },
+    });
 
-    const { object } = result;
+    const object = routerSchema.parse((result as { object: unknown }).object);
 
     const match = routes.find((r) => r.id === object.routeId);
+    const MIN_CONFIDENCE_THRESHOLD = 0.4;
 
     let nextHandle = "source-1";
-    if (object.confidence > 0.4 && match) {
+    if (object.confidence > MIN_CONFIDENCE_THRESHOLD && match) {
       nextHandle = `route-${match.id}`;
     }
 

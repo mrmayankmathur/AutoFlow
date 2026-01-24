@@ -1,7 +1,7 @@
 "use client";
 
 import ProfileForm from "@/components/forms/profile-form";
-import React, { useState } from "react";
+import { useState } from "react";
 import ProfilePicture from "./profile-picture";
 import { ThemeSelector } from "./theme-selector";
 import {
@@ -11,7 +11,6 @@ import {
   Lock,
   Bell,
   Shield,
-  CreditCard,
 } from "lucide-react";
 import { User as PrismaUser } from "@prisma/client";
 import { cn } from "@/lib/utils";

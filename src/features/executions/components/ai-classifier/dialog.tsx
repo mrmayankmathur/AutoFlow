@@ -50,25 +50,39 @@ import { createId } from "@paralleldrive/cuid2";
 import { useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 
-const formSchema = z.object({
-  variableName: z
-    .string()
-    .min(1, "Variable name is required")
-    .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, {
-      message: "Variable name must utilize letters, numbers, or underscores.",
-    }),
-  credentialId: z.string().min(1, "Credential is required"),
-  model: z.string().optional(),
-  routes: z
-    .array(
-      z.object({
-        id: z.string().min(1, "Route ID is required"),
-        label: z.string().min(1, "Label is required"),
-      })
-    )
-    .min(1, "At least one route is required"),
-  input: z.string().min(1, "Input text is required"),
-});
+const formSchema = z
+  .object({
+    variableName: z
+      .string()
+      .min(1, "Variable name is required")
+      .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, {
+        message: "Variable name must utilize letters, numbers, or underscores.",
+      }),
+    credentialId: z.string().min(1, "Credential is required"),
+    model: z.string().optional(),
+    routes: z
+      .array(
+        z.object({
+          id: z.string().min(1, "Route ID is required"),
+          label: z.string().min(1, "Label is required"),
+        })
+      )
+      .min(1, "At least one route is required"),
+    input: z.string().min(1, "Input text is required"),
+  })
+  .refine(
+    (data) => {
+      // If credentialId is present, model must also be a non-empty string
+      if (data.credentialId && data.credentialId.length > 0) {
+        return data.model && data.model.length > 0;
+      }
+      return true;
+    },
+    {
+      message: "Model is required when a credential is selected",
+      path: ["model"],
+    }
+  );
 
 export type AiClassifierFormValues = z.infer<typeof formSchema>;
 
@@ -120,6 +134,12 @@ export function AiClassifierDialog({
   const selectedCredentialId = form.watch("credentialId");
   const watchVariableName = form.watch("variableName") || "classification";
 
+  // Memoize the defaultValues string to avoid re-evaluation on every render
+  const defaultValuesKey = useMemo(
+    () => JSON.stringify(defaultValues),
+    [defaultValues]
+  );
+
   useEffect(() => {
     if (open) {
       const currentValues = form.getValues();
@@ -139,7 +159,7 @@ export function AiClassifierDialog({
         form.reset(newValues);
       }
     }
-  }, [open, JSON.stringify(defaultValues), form]);
+  }, [open, defaultValuesKey, form, defaultValues]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -470,7 +490,7 @@ export function AiClassifierDialog({
                         size="icon"
                         onClick={() => remove(index)}
                         disabled={fields.length === 1}
-                        aria-label={`Remove route ${fields[index]?.label || index + 1}`}
+                        aria-label={`Remove route ${fields[index]?.label?.trim() || index + 1}`}
                         className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Trash2 className="size-4" />

@@ -1,4 +1,3 @@
-import React from "react";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";

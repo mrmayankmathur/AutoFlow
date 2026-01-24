@@ -111,37 +111,42 @@ export const executeWorkflow = inngest.createFunction(
 
       const executor = getExecutor(node.type as NodeType);
 
-      let executionResult;
-      try {
-        executionResult = await executor({
-          data: node.data as Record<string, unknown>,
-          nodeId: node.id,
-          context,
-          userId,
-          step,
-          publish,
-        });
-      } catch (err: any) {
-        throw err;
-      }
+      let executionResult = await executor({
+        data: node.data as Record<string, unknown>,
+        nodeId: node.id,
+        context,
+        userId,
+        step,
+        publish,
+      });
 
       let nextHandle = "source-1";
       let stop = false;
 
+      // Type guard for structured execution results
+      const isStructuredResult = (
+        res: unknown
+      ): res is {
+        nextHandle?: string;
+        stop?: boolean;
+        context?: Record<string, unknown>;
+      } => {
+        return (
+          typeof res === "object" &&
+          res !== null &&
+          ("nextHandle" in res || "stop" in res || "context" in res)
+        );
+      };
+
       if (executionResult && typeof executionResult === "object") {
-        const res = executionResult as any;
-        if (
-          "nextHandle" in res ||
-          "stop" in res ||
-          ("context" in res && typeof res.context === "object")
-        ) {
-          if (res.context) {
-            context = { ...context, ...(res.context as object) };
+        if (isStructuredResult(executionResult)) {
+          if (executionResult.context) {
+            context = { ...context, ...executionResult.context };
           }
-          if (res.nextHandle) {
-            nextHandle = res.nextHandle;
+          if (executionResult.nextHandle) {
+            nextHandle = executionResult.nextHandle;
           }
-          if (res.stop) {
+          if (executionResult.stop) {
             stop = true;
           }
         } else {
@@ -149,6 +154,9 @@ export const executeWorkflow = inngest.createFunction(
         }
       }
 
+      // NOTE: The stop flag only halts THIS branch/node processing.
+      // Other nodes already in the executionQueue will still be processed.
+      // To stop the entire workflow, use `break` or `return` instead of `continue`.
       if (stop) {
         continue;
       }

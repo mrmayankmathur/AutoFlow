@@ -1,24 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getRecentExecutions } from "@/actions/user-settings";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Clock,
-  AlertCircle,
-  CheckCircle2,
-  PlayCircle,
-  Activity,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, PlayCircle, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -38,24 +25,28 @@ export const NotificationsSettings = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const loadData = async () => {
       try {
         const result = await getRecentExecutions(20);
-        if (result.success && result.data) {
-          setExecutions(result.data as any);
+        if (isMounted && result.success && result.data) {
+          setExecutions(result.data);
         } else {
           toast.error("Failed to load activity log");
         }
       } catch (e) {
         toast.error("Error loading activity");
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     loadData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: Execution["status"]) => {
     switch (status) {
       case "SUCCESS":
         return <CheckCircle2 className="h-4 w-4 text-green-500" />;
@@ -63,8 +54,6 @@ export const NotificationsSettings = () => {
         return <AlertCircle className="h-4 w-4 text-red-500" />;
       case "RUNNING":
         return <PlayCircle className="h-4 w-4 text-blue-500 animate-pulse" />;
-      default:
-        return <Activity className="h-4 w-4 text-neutral-500" />;
     }
   };
 
@@ -144,7 +133,10 @@ export const NotificationsSettings = () => {
                       </div>
                       {exec.error && (
                         <div className="mt-2 text-xs text-red-600 bg-red-50 dark:bg-red-900/10 p-2 rounded border border-red-100 dark:border-red-900/20 font-mono break-all">
-                          Error: {exec.error.substring(0, 100)}...
+                          Error:{" "}
+                          {exec.error.length > 100
+                            ? `${exec.error.substring(0, 100)}...`
+                            : exec.error}
                         </div>
                       )}
                     </div>

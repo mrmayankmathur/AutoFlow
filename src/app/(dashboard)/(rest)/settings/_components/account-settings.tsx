@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   deleteAccount,
   getActiveSessions,
   revokeSession,
   getUserStats,
 } from "@/actions/user-settings";
+import { Input } from "@/components/ui/input";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,7 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Laptop, Smartphone, Trash2, LogOut } from "lucide-react";
+import { Loader2, Laptop, Smartphone, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -57,6 +59,8 @@ export const AccountSettings = () => {
     null
   );
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [confirmationText, setConfirmationText] = useState("");
+  const REQUIRED_CONFIRMATION = "DELETE";
 
   useEffect(() => {
     fetchSessions();
@@ -68,9 +72,12 @@ export const AccountSettings = () => {
       const result = await getUserStats();
       if (result.success && result.data) {
         setStats(result.data);
+      } else {
+        toast.error("Failed to load account statistics");
       }
     } catch (e) {
       console.error(e);
+      toast.error("An error occurred while loading account statistics");
     } finally {
       setLoadingStats(false);
     }
@@ -130,6 +137,36 @@ export const AccountSettings = () => {
     if (ua.toLowerCase().includes("mobile"))
       return <Smartphone className="h-5 w-5" />;
     return <Laptop className="h-5 w-5" />;
+  };
+
+  // Parse userAgent to get a friendly, truncated name
+  const getFriendlyUserAgent = (ua: string | null): string => {
+    if (!ua) return "Unknown Device";
+
+    // Try to extract browser/OS info
+    let friendlyName = ua;
+
+    // Common browser patterns
+    if (ua.includes("Chrome")) {
+      const match = ua.match(/Chrome\/([\d.]+)/);
+      friendlyName = match ? `Chrome ${match[1].split(".")[0]}` : "Chrome";
+    } else if (ua.includes("Firefox")) {
+      const match = ua.match(/Firefox\/([\d.]+)/);
+      friendlyName = match ? `Firefox ${match[1].split(".")[0]}` : "Firefox";
+    } else if (ua.includes("Safari") && !ua.includes("Chrome")) {
+      const match = ua.match(/Version\/([\d.]+)/);
+      friendlyName = match ? `Safari ${match[1].split(".")[0]}` : "Safari";
+    } else if (ua.includes("Edge")) {
+      const match = ua.match(/Edg(?:e)?\/([\d.]+)/);
+      friendlyName = match ? `Edge ${match[1].split(".")[0]}` : "Edge";
+    }
+
+    // Truncate if still too long (> 40 chars)
+    if (friendlyName.length > 40) {
+      friendlyName = friendlyName.substring(0, 40) + "…";
+    }
+
+    return friendlyName;
   };
 
   return (
@@ -221,8 +258,11 @@ export const AccountSettings = () => {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-sm text-neutral-900 dark:text-neutral-100">
-                        {session.userAgent || "Unknown Device"}
+                      <p
+                        className="font-medium text-sm text-neutral-900 dark:text-neutral-100"
+                        title={session.userAgent || "Unknown Device"}
+                      >
+                        {getFriendlyUserAgent(session.userAgent)}
                       </p>
                       {session.isCurrent && (
                         <Badge
@@ -288,7 +328,7 @@ export const AccountSettings = () => {
               </p>
             </div>
 
-            <AlertDialog>
+            <AlertDialog onOpenChange={() => setConfirmationText("")}>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive">Delete Account</Button>
               </AlertDialogTrigger>
@@ -301,15 +341,36 @@ export const AccountSettings = () => {
                     servers.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
+                <div className="my-4">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+                    To confirm, type{" "}
+                    <span className="font-mono font-bold text-red-600">
+                      {REQUIRED_CONFIRMATION}
+                    </span>{" "}
+                    below:
+                  </p>
+                  <Input
+                    value={confirmationText}
+                    onChange={(e) => setConfirmationText(e.target.value)}
+                    placeholder={`Type ${REQUIRED_CONFIRMATION} to confirm`}
+                    className="font-mono"
+                    autoComplete="off"
+                  />
+                </div>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={(e) => {
                       e.preventDefault();
-                      handleDeleteAccount();
+                      if (confirmationText === REQUIRED_CONFIRMATION) {
+                        handleDeleteAccount();
+                      }
                     }}
                     className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-                    disabled={isDeletingAccount}
+                    disabled={
+                      isDeletingAccount ||
+                      confirmationText !== REQUIRED_CONFIRMATION
+                    }
                   >
                     {isDeletingAccount ? (
                       <>
