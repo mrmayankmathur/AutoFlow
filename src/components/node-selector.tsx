@@ -81,6 +81,12 @@ const executionNodes: NodeTypeOption[] = [
     description: "Sends a message to a Slack channel.",
     icon: "/logos/slack.svg",
   },
+  {
+    type: NodeType.AI_CLASSIFIER,
+    label: "AI Classifier",
+    description: "Classifies text into categories using AI.",
+    icon: "/logos/gemini.svg",
+  },
 ];
 
 interface NodeSelectorProps {
