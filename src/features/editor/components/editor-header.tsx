@@ -56,7 +56,10 @@ export const EditorSaveButton = ({ workflowId }: Props) => {
 
     saveWorkflow.mutate({
       id: workflowId,
-      nodes,
+      nodes: nodes.map((node) => ({
+        ...node,
+        type: node.type as any,
+      })),
       edges,
     });
   };
