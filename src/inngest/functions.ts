@@ -17,6 +17,7 @@ import { aiClassifierChannel } from "./channels/ai-classifier";
 export const executeWorkflow = inngest.createFunction(
   {
     id: "execute-workflow",
+    retries: process.env.NODE_ENV === "production" ? 3 : 0,
     onFailure: async ({ event, step }) => {
       return prisma.execution.update({
         where: {
