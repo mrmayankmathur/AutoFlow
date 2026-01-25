@@ -127,9 +127,11 @@ export const NotificationsSettings = () => {
                               ? "Workflow completed successfully"
                               : "Execution in progress"}
                         </p>
-                        <span className="text-xs font-mono text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">
-                          {getDuration(exec.startedAt, exec.completedAt)}
-                        </span>
+                        {exec.status !== "FAILED" && (
+                          <span className="text-xs font-mono text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">
+                            {getDuration(exec.startedAt, exec.completedAt)}
+                          </span>
+                        )}
                       </div>
                       {exec.error && (
                         <div className="mt-2 text-xs text-red-600 bg-red-50 dark:bg-red-900/10 p-2 rounded border border-red-100 dark:border-red-900/20 font-mono break-all">
