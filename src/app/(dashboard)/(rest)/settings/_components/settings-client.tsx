@@ -119,11 +119,14 @@ export const SettingsClient = ({
           <div className="flex-1 w-full space-y-8">
             {activeTab === "profile" && (
               <div className="bg-white dark:bg-[#1F212B] rounded-3xl p-8 shadow-sm border border-neutral-200/60 dark:border-neutral-800">
-                <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-8">
+                <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
                   Profile
                 </h2>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1 mb-6">
+                  View and update your profile information.
+                </p>
 
-                <div className="flex flex-col lg:flex-row gap-10">
+                <div className="flex flex-col lg:flex-row gap-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   {/* Left: Profile Picture Area */}
                   <div className="flex flex-col items-center lg:items-start gap-4 shrink-0">
                     <div className="relative">
@@ -159,7 +162,7 @@ export const SettingsClient = ({
                   </p>
                 </div>
 
-                <div className="w-full">
+                <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <ThemeSelector />
                 </div>
               </div>

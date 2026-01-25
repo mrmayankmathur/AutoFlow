@@ -65,7 +65,7 @@ const Settings = async (props: Props) => {
   };
 
   return (
-    <div className="">
+    <div>
       <SettingsClient
         user={user}
         removeProfileImage={removeProfileImage}

@@ -57,10 +57,6 @@ const ProfilePicture = ({ userImage, onDelete, onUpload }: Props) => {
 
   return (
     <div className="flex flex-col">
-      <p className="text-lg font-medium text-neutral-900 dark:text-white mb-4">
-        Profile Picture
-      </p>
-
       <div className="flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 p-6">
         {userImage ? (
           // STATE 1: Image Exists
