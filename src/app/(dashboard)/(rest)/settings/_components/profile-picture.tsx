@@ -19,7 +19,7 @@ const ProfilePicture = ({ userImage, onDelete, onUpload }: Props) => {
   const router = useRouter();
   const [isRemoving, setIsRemoving] = useState(false);
 
-  // 1. Setup UploadThing Hook
+  // UploadThing Hook
   const { startUpload, isUploading } = useUploadThing("profileImage", {
     onClientUploadComplete: async (res) => {
       if (res && res[0]) {
@@ -92,9 +92,8 @@ const ProfilePicture = ({ userImage, onDelete, onUpload }: Props) => {
             </Button>
           </div>
         ) : (
-          // STATE 2: No Image (Show Aceternity Dropzone)
+          // STATE 2: No Image
           <div className="relative w-full max-w-lg">
-            {/* Loading Overlay */}
             {isUploading && (
               <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-2 rounded-lg bg-white/80 dark:bg-black/80 backdrop-blur-sm">
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
