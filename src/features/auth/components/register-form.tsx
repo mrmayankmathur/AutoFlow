@@ -135,7 +135,7 @@ export function RegisterForm() {
               </p>
 
               <div className="absolute bottom-10 left-10 max-w-sm">
-                <h1 className="font-serif text-4xl leading-tight">
+                <h1 className="text-4xl leading-tight">
                   Build with intention.
                   <br />
                   Scale with intelligence.
@@ -149,7 +149,9 @@ export function RegisterForm() {
           </div>
 
           <div className="flex w-full flex-col justify-center px-8 py-12 md:w-1/2 md:px-14">
-            <h2 className="font-serif text-3xl">Create Account</h2>
+            <h2 className="text-3xl font-semibold opacity-75">
+              Create Account
+            </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Get started with your free account
             </p>

@@ -135,7 +135,7 @@ export function LoginForm() {
               </p>
 
               <div className="absolute bottom-10 left-10 max-w-sm">
-                <h1 className="font-serif text-4xl leading-tight">
+                <h1 className="text-4xl leading-tight">
                   Build with intention.
                   <br />
                   Scale with intelligence.
@@ -161,7 +161,7 @@ export function LoginForm() {
               </Link>
             </div>
 
-            <h2 className="font-serif text-3xl">Welcome Back</h2>
+            <h2 className="text-3xl font-semibold opacity-75">Welcome Back</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Enter your email and password to access your account
             </p>
