@@ -1,5 +1,7 @@
 import { generateSlug } from "random-word-slugs";
 import { prisma } from "@/lib/db";
+import { polarClient } from "@/lib/polar";
+import { TRPCError } from "@trpc/server";
 import {
   createTRPCRouter,
   premiumProcedure,
@@ -33,9 +35,31 @@ export const workflowsRouter = createTRPCRouter({
 
       return workflow;
     }),
-  create: premiumProcedure
+  create: protectedProcedure
     .input(createWorkflowSchema)
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
+      // Allow up to 3 workflows for users without an active subscription
+      const customer = await polarClient.customers.getStateExternal({
+        externalId: ctx.auth.user.id,
+      });
+
+      const hasActiveSubscription =
+        customer.activeSubscriptions &&
+        customer.activeSubscriptions.length > 0;
+
+      if (!hasActiveSubscription) {
+        const workflowCount = await prisma.workflow.count({
+          where: { userId: ctx.auth.user.id },
+        });
+
+        if (workflowCount >= 3) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Free plan is limited to 3 workflows. Upgrade to premium for unlimited workflows.",
+          });
+        }
+      }
+
       return prisma.workflow.create({
         data: {
           name: input.name,
