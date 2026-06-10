@@ -1,11 +1,11 @@
 import type { NodeExecutor } from "@/features/executions/types";
 import { NonRetriableError } from "inngest";
 import { generateText } from "ai";
-import { createOpenAI } from "@ai-sdk/openai";
 import Handlebars from "handlebars";
 import { openAIChannel } from "@/inngest/channels/openai";
 import { prisma } from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
+import { getAIModel } from "@/lib/ai/factory";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -97,14 +97,16 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
     throw new NonRetriableError("OPENAI NODE: Credential not found");
   }
 
-  const openai = createOpenAI({
+  const model = getAIModel({
+    provider: "OPENAI",
     apiKey: decrypt(credential.value),
-    baseURL: "https://models.github.ai/inference",
+    modelOverride: data.model,
+
   });
 
   try {
     const { steps } = await step.ai.wrap("openai-generate-text", generateText, {
-      model: openai.chat(data.model || "gpt-4o"),
+      model,
       system: systemPrompt,
       prompt: userPrompt,
       experimental_telemetry: {

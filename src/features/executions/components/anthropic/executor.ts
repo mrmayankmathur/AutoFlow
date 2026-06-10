@@ -1,11 +1,11 @@
 import type { NodeExecutor } from "@/features/executions/types";
 import { NonRetriableError } from "inngest";
 import { generateText } from "ai";
-import { createAnthropic } from "@ai-sdk/anthropic";
 import Handlebars from "handlebars";
 import { anthropicChannel } from "@/inngest/channels/anthropic";
 import { prisma } from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
+import { getAIModel, type AIProvider } from "@/lib/ai/factory";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -96,8 +96,10 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
     throw new NonRetriableError("ANTHROPIC NODE: Credential not found");
   }
 
-  const anthropic = createAnthropic({
+  const model = getAIModel({
+    provider: "ANTHROPIC" as AIProvider,
     apiKey: decrypt(credential.value),
+    modelOverride: data.model,
   });
 
   try {
@@ -105,7 +107,7 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
       "anthropic-generate-text",
       generateText,
       {
-        model: anthropic(data.model || "claude-sonnet-4-5"),
+        model,
         system: systemPrompt,
         prompt: userPrompt,
         experimental_telemetry: {

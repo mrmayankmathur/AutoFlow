@@ -45,8 +45,6 @@ import {
   Wand2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
 
 export type GeminiFormValues = z.infer<typeof formSchema>;
 
@@ -61,6 +59,8 @@ const AVAILABLE_MODELS = [
   "gemini-2.5-pro",
   "gemini-2.5-flash",
   "gemini-3-flash-preview",
+  "gemini-3.1-flash-lite",
+  "gemini-3.5-flash",
   "gemini-3-pro-preview",
 ] as const;
 
@@ -91,7 +91,7 @@ export const GeminiDialog = ({
     defaultValues: {
       variableName: defaultValues.variableName || "",
       credentialId: defaultValues.credentialId || "",
-      model: defaultValues.model || "gemini-3-flash-preview",
+      model: defaultValues.model || "gemini-3.5-flash",
       systemPrompt: defaultValues.systemPrompt || "",
       userPrompt: defaultValues.userPrompt || "",
     },
@@ -102,7 +102,7 @@ export const GeminiDialog = ({
       form.reset({
         variableName: defaultValues.variableName || "",
         credentialId: defaultValues.credentialId || "",
-        model: defaultValues.model || "gemini-3-flash-preview",
+        model: defaultValues.model || "gemini-3.5-flash",
         systemPrompt: defaultValues.systemPrompt || "",
         userPrompt: defaultValues.userPrompt || "",
       });

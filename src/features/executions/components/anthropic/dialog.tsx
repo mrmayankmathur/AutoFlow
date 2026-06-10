@@ -57,12 +57,10 @@ interface Props {
 
 const AVAILABLE_MODELS = [
   "claude-sonnet-4-5",
-  "claude-sonnet-4-0",
-  "claude-opus-4-0",
-  "claude-opus-4-5",
-  "claude-3-7-sonnet-latest",
-  "claude-haiku-4-5",
-  "claude-3-5-haiku-latest",
+  "claude-sonnet-4-6",
+  "claude-opus-4-7",
+  "claude-opus-4-6",
+  "claude-haiku-4-6",
 ] as const;
 
 const formSchema = z.object({

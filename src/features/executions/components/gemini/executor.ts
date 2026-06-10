@@ -1,11 +1,11 @@
 import type { NodeExecutor } from "@/features/executions/types";
 import { NonRetriableError } from "inngest";
 import { generateText } from "ai";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import Handlebars from "handlebars";
 import { geminiChannel } from "@/inngest/channels/gemini";
 import { prisma } from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
+import { getAIModel, type AIProvider } from "@/lib/ai/factory";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -98,13 +98,15 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
 
   const credentialValue = decrypt(credential.value);
 
-  const google = createGoogleGenerativeAI({
+  const model = getAIModel({
+    provider: "GEMINI",
     apiKey: credentialValue,
+    modelOverride: data.model,
   });
 
   try {
     const { steps } = await step.ai.wrap("gemini-generate-text", generateText, {
-      model: google(data.model || "gemini-3-flash-preview"),
+      model,
       system: systemPrompt,
       prompt: userPrompt,
       experimental_telemetry: {

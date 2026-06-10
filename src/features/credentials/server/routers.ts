@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/db";
 import {
   createTRPCRouter,
-  premiumProcedure,
   protectedProcedure,
 } from "@/trpc/init";
 import { z } from "zod";
@@ -16,7 +15,7 @@ const createCredentialSchema = z.object({
 });
 
 export const credentialsRouter = createTRPCRouter({
-  create: premiumProcedure
+  create: protectedProcedure
     .input(createCredentialSchema)
     .mutation(({ ctx, input }) => {
       const { name, type, value } = input;
