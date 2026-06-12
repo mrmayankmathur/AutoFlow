@@ -19,7 +19,15 @@ const Navbar = async (props: Props) => {
   return (
     <header className="max-w-screen fixed right-0 left-0 top-0 py-4 px-4 bg-black/40 backdrop-blur-lg z-100 flex items-center border-b border-neutral-900 justify-between">
       <div className="flex items-center gap-0 scale-125 ml-2">
-        <Image src="/textLogo.png" width={75} height={75} alt="fuzzie logo" />
+        <Image
+          src="/textLogo.png"
+          width={75}
+          height={75}
+          alt="autoflow logo"
+          priority
+          sizes="75px"
+          style={{ objectFit: 'contain' }}
+        />
       </div>
       <nav className="absolute left-[50%] top-[50%] transform translate-x-[-50%] translate-y-[-50%] hidden lg:block">
         <ul className="flex items-center gap-y-4 gap-x-8 list-none dark:text-white">

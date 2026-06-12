@@ -1,31 +1,29 @@
 // This file configures the initialization of Sentry on the client.
-// The added config here will be used whenever a users loads a page in their browser.
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/
-
+// We use dynamic imports to prevent Sentry's giant session replay SDK
+// from immediately blocking the initial Next.js browser hydration!
 import * as Sentry from "@sentry/nextjs";
 
-Sentry.init({
-  dsn: "https://008ada537d4e8a3784a9118dfca7249b@o4509892130045952.ingest.us.sentry.io/4510579120537600",
+// First we only capture errors conditionally so the core app loads fast
+const loadSentry = async () => {
+  Sentry.init({
+    dsn: "https://008ada537d4e8a3784a9118dfca7249b@o4509892130045952.ingest.us.sentry.io/4510579120537600",
 
-  // Add optional integrations for additional features
-  integrations: [Sentry.replayIntegration()],
+    integrations: [Sentry.replayIntegration()],
 
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
-  // Enable logs to be sent to Sentry
-  enableLogs: true,
+    tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
+    enableLogs: true,
 
-  // Define how likely Replay events are sampled.
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.1,
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
 
-  // Define how likely Replay events are sampled when an error occurs.
-  replaysOnErrorSampleRate: 1.0,
+    sendDefaultPii: true,
+  });
+};
 
-  // Enable sending user PII (Personally Identifiable Information)
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
-  sendDefaultPii: true,
-});
+if (typeof window !== "undefined") {
+  // Only boot Sentry session replay after the browser completes the immediate Next.js task loads!
+  // This defers the ~200kb Sentry payload from blocking the visual DOM render.
+  window.requestIdleCallback ? window.requestIdleCallback(loadSentry) : setTimeout(loadSentry, 500);
+}
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
