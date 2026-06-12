@@ -1,7 +1,7 @@
 "use client";
 
 import { useReactFlow, type Node, type NodeProps } from "@xyflow/react";
-import { memo, useState } from "react";
+import { memo, useState, useCallback, useMemo } from "react";
 import { BaseExecutionNode } from "../base-execution-node";
 import { GlobeIcon } from "lucide-react";
 import { HTTPRequestFormValues, HTTPRequestDialog } from "./dialog";
@@ -23,11 +23,13 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
   const { setNodes } = useReactFlow();
 
   const nodeData = props.data;
-  const description = nodeData?.endpoint
-    ? `${nodeData.method || "GET"}: ${nodeData.endpoint}`
-    : "Not configured";
+  const description = useMemo(() => {
+    return nodeData?.endpoint
+      ? `${nodeData.method || "GET"}: ${nodeData.endpoint}`
+      : "Not configured";
+  }, [nodeData?.endpoint, nodeData?.method]);
 
-  const handleSubmit = (values: HTTPRequestFormValues) => {
+  const handleSubmit = useCallback((values: HTTPRequestFormValues) => {
     setNodes((nodes) =>
       nodes.map((node) => {
         if (node.id === props.id) {
@@ -43,11 +45,11 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
       })
     );
     setDialogOpen(false);
-  };
+  }, [props.id, setNodes]);
 
-  const handleOpenSettings = () => {
+  const handleOpenSettings = useCallback(() => {
     setDialogOpen(true);
-  };
+  }, []);
 
   const nodeStatus = useNodeStatus({
     nodeId: props.id,
@@ -75,6 +77,15 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
         onDoubleClick={handleOpenSettings}
       />
     </>
+  );
+}, (prev, next) => {
+  return (
+    prev.id === next.id &&
+    prev.selected === next.selected &&
+    prev.dragging === next.dragging &&
+    prev.positionAbsoluteX === next.positionAbsoluteX &&
+    prev.positionAbsoluteY === next.positionAbsoluteY &&
+    JSON.stringify(prev.data) === JSON.stringify(next.data)
   );
 });
 

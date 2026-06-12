@@ -3,7 +3,7 @@
 import { type NodeProps, Position, useReactFlow } from "@xyflow/react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
-import { memo, type ReactNode } from "react";
+import { memo, useCallback, type ReactNode } from "react";
 import { BaseNode, BaseNodeContent } from "@/components/react-flow/base-node";
 import { BaseHandle } from "@/components/react-flow/base-handle";
 import { WorkflowNode } from "@/components/workflow-node";
@@ -37,7 +37,7 @@ export const BaseExecutionNode = memo(
   }: BaseExecutionNodeProps) => {
     const { setNodes, setEdges } = useReactFlow();
 
-    const handleDelete = () => {
+    const handleDelete = useCallback(() => {
       setNodes((nodes) => {
         const updatedNodes = nodes.filter((node) => node.id !== id);
         return updatedNodes;
@@ -48,7 +48,7 @@ export const BaseExecutionNode = memo(
         );
         return updatedEdges;
       });
-    };
+    }, [id, setNodes, setEdges]);
 
     return (
       <WorkflowNode

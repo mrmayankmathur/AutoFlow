@@ -122,84 +122,93 @@ export const workflowsRouter = createTRPCRouter({
         },
       });
 
-      return await prisma.$transaction(async (tx) => {
-        // Delete connections that aren't in the incoming payload anymore
-        if (edges.length > 0) {
-          const incomingEdgeIds = edges.map(
-            (e) => e.id || `conn_${e.source}_${e.target}`
+      return await prisma.$transaction(
+        async (tx) => {
+          // Delete connections that aren't in the incoming payload anymore
+          if (edges.length > 0) {
+            const incomingEdgeIds = edges.map(
+              (e) => e.id || `conn_${e.source}_${e.target}`
+            );
+            await tx.connection.deleteMany({
+              where: {
+                workflowId: id,
+                id: { notIn: incomingEdgeIds },
+              },
+            });
+          } else {
+            await tx.connection.deleteMany({ where: { workflowId: id } });
+          }
+
+          // Delete nodes that aren't in the incoming payload anymore
+          if (nodes.length > 0) {
+            await tx.node.deleteMany({
+              where: {
+                workflowId: id,
+                id: { notIn: nodes.map((n) => n.id) },
+              },
+            });
+          } else {
+            await tx.node.deleteMany({ where: { workflowId: id } });
+          }
+
+          // Upsert nodes simultaneously
+          await Promise.all(
+            nodes.map((node) =>
+              tx.node.upsert({
+                where: { id: node.id },
+                update: {
+                  position: node.position,
+                  data: node.data || {},
+                },
+                create: {
+                  id: node.id,
+                  workflowId: id,
+                  type: node.type as NodeType,
+                  name: node.type || "unknown",
+                  position: node.position,
+                  data: node.data || {},
+                },
+              })
+            )
           );
-          await tx.connection.deleteMany({
+
+          // Upsert connections simultaneously
+          await Promise.all(
+            edges.map((edge) => {
+              const edgeId = edge.id || `conn_${edge.source}_${edge.target}`;
+              return tx.connection.upsert({
+                where: { id: edgeId },
+                update: {
+                  fromOutput: edge.sourceHandle || "main",
+                  toInput: edge.targetHandle || "main",
+                },
+                create: {
+                  id: edgeId,
+                  workflowId: id,
+                  fromNodeId: edge.source,
+                  toNodeId: edge.target,
+                  fromOutput: edge.sourceHandle || "main",
+                  toInput: edge.targetHandle || "main",
+                },
+              });
+            })
+          );
+
+          await tx.workflow.update({
             where: {
-              workflowId: id,
-              id: { notIn: incomingEdgeIds },
+              id,
+            },
+            data: {
+              updatedAt: new Date(),
             },
           });
-        } else {
-          await tx.connection.deleteMany({ where: { workflowId: id } });
+
+          return workflow;
+        },
+        {
+          timeout: 15000,
         }
-
-        // Delete nodes that aren't in the incoming payload anymore
-        if (nodes.length > 0) {
-          await tx.node.deleteMany({
-            where: {
-              workflowId: id,
-              id: { notIn: nodes.map((n) => n.id) },
-            },
-          });
-        } else {
-          await tx.node.deleteMany({ where: { workflowId: id } });
-        }
-
-        // Upsert nodes
-        for (const node of nodes) {
-          await tx.node.upsert({
-            where: { id: node.id },
-            update: {
-              position: node.position,
-              data: node.data || {},
-            },
-            create: {
-              id: node.id,
-              workflowId: id,
-              type: node.type as NodeType,
-              name: node.type || "unknown",
-              position: node.position,
-              data: node.data || {},
-            },
-          });
-        }
-
-        // Upsert connections
-        for (const edge of edges) {
-          const edgeId = edge.id || `conn_${edge.source}_${edge.target}`;
-          await tx.connection.upsert({
-            where: { id: edgeId },
-            update: {
-              fromOutput: edge.sourceHandle || "main",
-              toInput: edge.targetHandle || "main",
-            },
-            create: {
-              id: edgeId,
-              workflowId: id,
-              fromNodeId: edge.source,
-              toNodeId: edge.target,
-              fromOutput: edge.sourceHandle || "main",
-              toInput: edge.targetHandle || "main",
-            },
-          });
-        }
-
-        await tx.workflow.update({
-          where: {
-            id,
-          },
-          data: {
-            updatedAt: new Date(),
-          },
-        });
-
-        return workflow;
-      });
+      );
     }),
 
   updateName: protectedProcedure

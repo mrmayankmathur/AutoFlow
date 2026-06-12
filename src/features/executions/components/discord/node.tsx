@@ -1,7 +1,7 @@
 "use client";
 
 import { useReactFlow, type Node, type NodeProps } from "@xyflow/react";
-import { memo, useState } from "react";
+import { memo, useState, useCallback, useMemo } from "react";
 import { BaseExecutionNode } from "../base-execution-node";
 import { DiscordFormValues, DiscordDialog } from "./dialog";
 import { useNodeStatus } from "../../hooks/use-node-status";
@@ -21,11 +21,13 @@ export const DiscordNode = memo((props: NodeProps<DiscordNodeType>) => {
   const { setNodes } = useReactFlow();
 
   const nodeData = props.data;
-  const description = nodeData?.content
-    ? `Send ${nodeData.content.slice(0, 50)}...`
-    : "Not configured";
+  const description = useMemo(() => {
+    return nodeData?.content
+      ? `Send ${nodeData.content.slice(0, 50)}...`
+      : "Not configured";
+  }, [nodeData?.content]);
 
-  const handleSubmit = (values: DiscordFormValues) => {
+  const handleSubmit = useCallback((values: DiscordFormValues) => {
     setNodes((nodes) =>
       nodes.map((node) => {
         if (node.id === props.id) {
@@ -41,11 +43,11 @@ export const DiscordNode = memo((props: NodeProps<DiscordNodeType>) => {
       })
     );
     setDialogOpen(false);
-  };
+  }, [props.id, setNodes]);
 
-  const handleOpenSettings = () => {
+  const handleOpenSettings = useCallback(() => {
     setDialogOpen(true);
-  };
+  }, []);
 
   const nodeStatus = useNodeStatus({
     nodeId: props.id,
@@ -73,6 +75,15 @@ export const DiscordNode = memo((props: NodeProps<DiscordNodeType>) => {
         onDoubleClick={handleOpenSettings}
       />
     </>
+  );
+}, (prev, next) => {
+  return (
+    prev.id === next.id &&
+    prev.selected === next.selected &&
+    prev.dragging === next.dragging &&
+    prev.positionAbsoluteX === next.positionAbsoluteX &&
+    prev.positionAbsoluteY === next.positionAbsoluteY &&
+    JSON.stringify(prev.data) === JSON.stringify(next.data)
   );
 });
 

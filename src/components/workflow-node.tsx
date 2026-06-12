@@ -2,7 +2,7 @@
 
 import { NodeToolbar, Position } from "@xyflow/react";
 import { SettingsIcon, TrashIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import { Button } from "./ui/button";
 
 interface WorkflowNodeProps {
@@ -14,7 +14,7 @@ interface WorkflowNodeProps {
   description?: string;
 }
 
-export const WorkflowNode = ({
+export const WorkflowNode = memo(({
   children,
   showToolbar = true,
   onDelete,
@@ -63,4 +63,6 @@ export const WorkflowNode = ({
       )}
     </>
   );
-};
+});
+
+WorkflowNode.displayName = "WorkflowNode";

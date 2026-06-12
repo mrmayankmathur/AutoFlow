@@ -6,7 +6,7 @@ import {
   type NodeProps,
   Position,
 } from "@xyflow/react";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useState, useMemo } from "react";
 import { BaseExecutionNode } from "../base-execution-node";
 import { AiClassifierFormValues, AiClassifierDialog } from "./dialog";
 import { useNodeStatus } from "../../hooks/use-node-status";
@@ -31,10 +31,11 @@ export const AiClassifierNode = memo(
 
     const nodeData = props.data;
     const routes = nodeData?.routes || [];
-    const description =
-      routes.length > 0
+    const description = useMemo(() => {
+      return routes.length > 0
         ? `Router: ${routes.map((r) => r.label).join(", ")}`
         : "Not configured";
+    }, [routes]);
 
     const handleSubmit = useCallback(
       (values: AiClassifierFormValues) => {
@@ -120,6 +121,16 @@ export const AiClassifierNode = memo(
           </div>
         </BaseExecutionNode>
       </>
+    );
+  },
+  (prev, next) => {
+    return (
+      prev.id === next.id &&
+      prev.selected === next.selected &&
+      prev.dragging === next.dragging &&
+      prev.positionAbsoluteX === next.positionAbsoluteX &&
+      prev.positionAbsoluteY === next.positionAbsoluteY &&
+      JSON.stringify(prev.data) === JSON.stringify(next.data)
     );
   }
 );
