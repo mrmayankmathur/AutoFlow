@@ -1,12 +1,12 @@
 "use client";
 
-import { useReactFlow, type Node, type NodeProps } from "@xyflow/react";
-import { memo, useState, useCallback, useMemo } from "react";
-import { BaseExecutionNode } from "../base-execution-node";
-import { AnthropicFormValues, AnthropicDialog } from "./dialog";
-import { useNodeStatus } from "../../hooks/use-node-status";
+import { type Node, type NodeProps, useReactFlow } from "@xyflow/react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { ANTHROPIC_CHANNEL_NAME } from "@/inngest/channels/anthropic";
+import { useNodeStatus } from "../../hooks/use-node-status";
+import { BaseExecutionNode } from "../base-execution-node";
 import { fetchAnthropicRealtimeToken } from "./actions";
+import { AnthropicDialog, type AnthropicFormValues } from "./dialog";
 
 type AnthropicNodeData = {
   variableName?: string;
@@ -18,75 +18,81 @@ type AnthropicNodeData = {
 
 type AnthropicNodeType = Node<AnthropicNodeData>;
 
-export const AnthropicNode = memo((props: NodeProps<AnthropicNodeType>) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const { setNodes } = useReactFlow();
+export const AnthropicNode = memo(
+  (props: NodeProps<AnthropicNodeType>) => {
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const { setNodes } = useReactFlow();
 
-  const nodeData = props.data;
-  const description = useMemo(() => {
-    return nodeData?.userPrompt
-      ? `${nodeData.model || "claude-sonnet-4-5"}: ${nodeData.userPrompt.slice(0, 50)}...`
-      : "Not configured";
-  }, [nodeData?.userPrompt, nodeData?.model]);
+    const nodeData = props.data;
+    const description = useMemo(() => {
+      return nodeData?.userPrompt
+        ? `${nodeData.model || "claude-sonnet-4-5"}: ${nodeData.userPrompt.slice(0, 50)}...`
+        : "Not configured";
+    }, [nodeData?.userPrompt, nodeData?.model]);
 
-  const handleSubmit = useCallback((values: AnthropicFormValues) => {
-    setNodes((nodes) =>
-      nodes.map((node) => {
-        if (node.id === props.id) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              ...values,
-            },
-          };
-        }
-        return node;
-      })
+    const handleSubmit = useCallback(
+      (values: AnthropicFormValues) => {
+        setNodes((nodes) =>
+          nodes.map((node) => {
+            if (node.id === props.id) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  ...values,
+                },
+              };
+            }
+            return node;
+          }),
+        );
+        setDialogOpen(false);
+      },
+      [props.id, setNodes],
     );
-    setDialogOpen(false);
-  }, [props.id, setNodes]);
 
-  const handleOpenSettings = useCallback(() => {
-    setDialogOpen(true);
-  }, []);
+    const handleOpenSettings = useCallback(() => {
+      setDialogOpen(true);
+    }, []);
 
-  const nodeStatus = useNodeStatus({
-    nodeId: props.id,
-    channel: ANTHROPIC_CHANNEL_NAME,
-    topic: "status",
-    refreshToken: fetchAnthropicRealtimeToken,
-  });
+    const nodeStatus = useNodeStatus({
+      nodeId: props.id,
+      channel: ANTHROPIC_CHANNEL_NAME,
+      topic: "status",
+      refreshToken: fetchAnthropicRealtimeToken,
+    });
 
-  return (
-    <>
-      <AnthropicDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        onSubmit={handleSubmit}
-        defaultValues={nodeData}
-      />
-      <BaseExecutionNode
-        {...props}
-        id={props.id}
-        icon="/logos/anthropic.svg"
-        name="Anthropic"
-        description={description}
-        status={nodeStatus.status}
-        onSettings={handleOpenSettings}
-        onDoubleClick={handleOpenSettings}
-      />
-    </>
-  );
-}, (prev, next) => {
-  return (
-    prev.id === next.id &&
-    prev.selected === next.selected &&
-    prev.dragging === next.dragging &&
-    prev.positionAbsoluteX === next.positionAbsoluteX &&
-    prev.positionAbsoluteY === next.positionAbsoluteY &&
-    JSON.stringify(prev.data) === JSON.stringify(next.data)
-  );
-});
+    return (
+      <>
+        <AnthropicDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          onSubmit={handleSubmit}
+          defaultValues={nodeData}
+        />
+        <BaseExecutionNode
+          {...props}
+          id={props.id}
+          icon="/logos/anthropic.svg"
+          name="Anthropic"
+          description={description}
+          status={nodeStatus.status}
+          onSettings={handleOpenSettings}
+          onDoubleClick={handleOpenSettings}
+        />
+      </>
+    );
+  },
+  (prev, next) => {
+    return (
+      prev.id === next.id &&
+      prev.selected === next.selected &&
+      prev.dragging === next.dragging &&
+      prev.positionAbsoluteX === next.positionAbsoluteX &&
+      prev.positionAbsoluteY === next.positionAbsoluteY &&
+      JSON.stringify(prev.data) === JSON.stringify(next.data)
+    );
+  },
+);
 
 AnthropicNode.displayName = "AnthropicNode";

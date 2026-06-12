@@ -1,7 +1,7 @@
-import { db } from "@/lib/db";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { SettingsClient } from "./_components/settings-client";
 
 type Props = {};

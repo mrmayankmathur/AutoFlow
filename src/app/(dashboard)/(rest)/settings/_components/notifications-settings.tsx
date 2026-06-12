@@ -1,12 +1,12 @@
 "use client";
 
+import { Activity, AlertCircle, CheckCircle2, PlayCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { getRecentExecutions } from "@/actions/user-settings";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, CheckCircle2, PlayCircle, Activity } from "lucide-react";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 type Execution = {
@@ -105,7 +105,7 @@ export const NotificationsSettings = () => {
                         exec.status === "FAILED" &&
                           "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-900/30",
                         exec.status === "RUNNING" &&
-                          "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-900/30"
+                          "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-900/30",
                       )}
                     >
                       {getStatusIcon(exec.status)}

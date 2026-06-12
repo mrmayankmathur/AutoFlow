@@ -8,5 +8,5 @@ export const WorkflowsListClient = dynamic(
   {
     ssr: false,
     loading: () => <WorkflowsLoading />,
-  }
+  },
 );

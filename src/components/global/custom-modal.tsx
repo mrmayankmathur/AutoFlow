@@ -1,3 +1,4 @@
+import type React from "react";
 import {
   Drawer,
   DrawerClose,
@@ -9,8 +10,6 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useModal } from "@/providers/modal-provider";
-
-import React from "react";
 import { Button } from "../ui/button";
 
 type Props = {

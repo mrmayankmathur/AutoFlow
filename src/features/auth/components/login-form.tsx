@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -18,9 +19,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
-import { Eye, EyeOff } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { authClient } from "@/lib/auth-client";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -60,7 +60,7 @@ export function LoginForm() {
           onError: (ctx) => {
             toast.error(ctx.error.message);
           },
-        }
+        },
       );
     } catch (error) {
       toast.error(`An unexpected error occurred. ${error} Please try again.`);
@@ -85,7 +85,7 @@ export function LoginForm() {
             toast.error("Something went wrong. Please try again.");
             setPendingSocialProvider(null);
           },
-        }
+        },
       );
     } catch (error) {
       toast.error(`An unexpected error occurred. ${error} Please try again.`);

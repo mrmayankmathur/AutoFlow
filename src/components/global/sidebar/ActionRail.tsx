@@ -1,7 +1,7 @@
 "use client";
 
-import { Database, GitBranch, LucideMousePointerClick } from "lucide-react";
 import clsx from "clsx";
+import { Database, GitBranch, LucideMousePointerClick } from "lucide-react";
 
 const items = [
   { icon: LucideMousePointerClick, active: true },
@@ -18,7 +18,7 @@ export const ActionRail = () => {
         "dark:bg-[#353346]/30 bg-neutral-200/50",
         "py-4 px-2 rounded-full",
         "h-56 overflow-y-auto",
-        "border border-neutral-300 dark:border-neutral-700"
+        "border border-neutral-300 dark:border-neutral-700",
       )}
     >
       {items.map((item, index) => {
@@ -35,7 +35,7 @@ export const ActionRail = () => {
               className={clsx(
                 item.active
                   ? "dark:text-white text-black"
-                  : "text-muted-foreground"
+                  : "text-muted-foreground",
               )}
             />
 

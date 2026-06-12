@@ -1,44 +1,44 @@
 "use client";
 
-import { useState, useCallback, useRef, useMemo, useEffect } from "react";
-import { ErrorView, LoadingView } from "@/components/entity-components";
-import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
 import {
-  ReactFlow,
-  applyNodeChanges,
-  applyEdgeChanges,
   addEdge,
-  ReactFlowProvider,
-  useReactFlow,
-  useStoreApi,
-  type Node,
-  type Edge,
-  type NodeChange,
-  type EdgeChange,
+  applyEdgeChanges,
+  applyNodeChanges,
+  Background,
+  type ColorMode,
   type Connection,
   Controls,
-  MiniMap,
-  Background,
-  ColorMode,
-  Panel,
-  type OnNodeDrag,
   type DefaultEdgeOptions,
-  SelectionMode,
+  type Edge,
+  type EdgeChange,
   getOutgoers,
+  MiniMap,
+  type Node,
+  type NodeChange,
+  type OnNodeDrag,
+  Panel,
+  ReactFlow,
+  ReactFlowProvider,
+  SelectionMode,
+  useReactFlow,
+  useStoreApi,
 } from "@xyflow/react";
-import { Undo, Redo } from "lucide-react";
+import { Redo, Undo } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ErrorView, LoadingView } from "@/components/entity-components";
+import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
 
 import "@xyflow/react/dist/style.css";
-import { nodeComponents } from "@/config/node-components";
-import { useTheme } from "next-themes";
-import { AddNodeButton } from "./add-node-button";
-import { useSetAtom } from "jotai";
-import { editorAtom } from "../store/atoms";
-import { NavigationControls } from "./navigation-control";
 import { NodeType } from "@prisma/client";
-import { ExecuteWorkflowButton } from "./execute-workflow-button";
-import { useUndoRedo } from "@/hooks/use-undo-redo";
+import { useSetAtom } from "jotai";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
+import { nodeComponents } from "@/config/node-components";
+import { useUndoRedo } from "@/hooks/use-undo-redo";
+import { editorAtom } from "../store/atoms";
+import { AddNodeButton } from "./add-node-button";
+import { ExecuteWorkflowButton } from "./execute-workflow-button";
+import { NavigationControls } from "./navigation-control";
 
 const MIN_DISTANCE = 150;
 const defaultEdgeOptions: DefaultEdgeOptions = {
@@ -110,7 +110,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
             const internalEdges = getEdges().filter(
               (edge) =>
                 selectedNodeIds.includes(edge.source) &&
-                selectedNodeIds.includes(edge.target)
+                selectedNodeIds.includes(edge.target),
             );
 
             clipboardRef.current = {
@@ -193,7 +193,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
       const isStructureChange = changes.some(
-        (c) => c.type === "remove" || c.type === "add"
+        (c) => c.type === "remove" || c.type === "add",
       );
 
       if (isStructureChange) {
@@ -202,13 +202,13 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
 
       setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot));
     },
-    [takeSnapshot, setNodes]
+    [takeSnapshot, setNodes],
   );
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       const isStructureChange = changes.some(
-        (c) => c.type === "remove" || c.type === "add"
+        (c) => c.type === "remove" || c.type === "add",
       );
 
       if (isStructureChange) {
@@ -216,7 +216,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
       }
       setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot));
     },
-    [takeSnapshot, setEdges]
+    [takeSnapshot, setEdges],
   );
 
   const onNodeDragStart = useCallback(() => {
@@ -228,7 +228,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
       takeSnapshot();
       setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot));
     },
-    [takeSnapshot, setEdges]
+    [takeSnapshot, setEdges],
   );
 
   // --- Helpers & Visual Logic ---
@@ -256,11 +256,11 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
           }
           return res;
         },
-        { distance: Number.MAX_VALUE, node: null as Node | null }
+        { distance: Number.MAX_VALUE, node: null as Node | null },
       );
       return closestNode.node;
     },
-    [store]
+    [store],
   );
 
   const { setCenter } = useReactFlow();
@@ -280,7 +280,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
   const onNodeDrag: OnNodeDrag = useCallback(
     (e, node) => {
       const nodeDiv = document.querySelector(
-        `.react-flow__node[data-id="${node.id}"]`
+        `.react-flow__node[data-id="${node.id}"]`,
       );
       if (!nodeDiv) return;
 
@@ -291,7 +291,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
       const edgeFoundElement = document
         .elementsFromPoint(centerX, centerY)
         .find((el) =>
-          el.classList.contains("react-flow__edge-interaction")
+          el.classList.contains("react-flow__edge-interaction"),
         )?.parentElement;
 
       const edgeId = edgeFoundElement?.dataset.id;
@@ -349,14 +349,14 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         }
       }
     },
-    [updateEdge, getClosestNode, getEdge, setEdges]
+    [updateEdge, getClosestNode, getEdge, setEdges],
   );
 
   const getClosestHandle = useCallback(
     (
       nodeInternal: any,
       otherNodePos: { x: number; y: number },
-      handleType: "source" | "target"
+      handleType: "source" | "target",
     ) => {
       const handles = nodeInternal?.internals?.handleBounds?.[handleType];
       if (!handles || handles.length === 0) return null;
@@ -385,7 +385,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
 
       return closestHandleId;
     },
-    []
+    [],
   );
 
   const getNodeCenter = useCallback((nodeInternal: any) => {
@@ -426,7 +426,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
 
       return checkPath(targetNode);
     },
-    [getNodes, getEdges]
+    [getNodes, getEdges],
   );
 
   const onNodeDragStop: OnNodeDrag = useCallback(
@@ -453,14 +453,14 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
           const newNodeInputHandle = getClosestHandle(
             newNodeInternal,
             sourceNodePos,
-            "target"
+            "target",
           );
 
           // Find closest output handle on NEW node (to target node)
           const newNodeOutputHandle = getClosestHandle(
             newNodeInternal,
             targetNodePos,
-            "source"
+            "source",
           );
 
           updateEdge(overlappedId, {
@@ -508,13 +508,13 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
         const sourceHandle = getClosestHandle(
           sourceNodeInternal,
           targetNodePos,
-          "source"
+          "source",
         );
 
         const targetHandle = getClosestHandle(
           targetNodeInternal,
           sourceNodePos,
-          "target"
+          "target",
         );
 
         setEdges((es) => {
@@ -526,7 +526,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
               (e.sourceHandle === sourceHandle ||
                 (!e.sourceHandle && !sourceHandle)) &&
               (e.targetHandle === targetHandle ||
-                (!e.targetHandle && !targetHandle))
+                (!e.targetHandle && !targetHandle)),
           );
 
           if (alreadyConnected) return filtered;
@@ -558,7 +558,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
       getClosestHandle,
       isCyclic,
       getNodeCenter,
-    ]
+    ],
   );
 
   const isValidConnection = useCallback(
@@ -568,7 +568,7 @@ const EditorCanvas = ({ workflow }: { workflow: any }) => {
       // If isCyclic returns true, the connection is INVALID
       return !isCyclic(connection.source, connection.target);
     },
-    [isCyclic]
+    [isCyclic],
   );
 
   return (

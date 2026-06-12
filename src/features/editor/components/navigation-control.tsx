@@ -1,5 +1,5 @@
+import { Panel, useReactFlow } from "@xyflow/react";
 import React, { useCallback } from "react";
-import { useReactFlow, Panel } from "@xyflow/react";
 
 const PAN_AMOUNT = 50; // Pixels to move per click
 
@@ -84,7 +84,7 @@ export const NavigationControls = () => {
       const { x, y, zoom } = getViewport();
       setViewport({ x: x + dx, y: y + dy, zoom });
     },
-    [getViewport, setViewport]
+    [getViewport, setViewport],
   );
 
   const btnClass =

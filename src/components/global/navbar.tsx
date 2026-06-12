@@ -1,8 +1,8 @@
+import { MenuIcon } from "lucide-react";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { MenuIcon } from "lucide-react";
-import { headers } from "next/headers";
 import { auth } from "@/lib/auth"; // Adjust this import to where your server auth is defined
 import UserButton from "./user-button"; // We will create this below
 
@@ -26,7 +26,7 @@ const Navbar = async (props: Props) => {
           alt="autoflow logo"
           priority
           sizes="75px"
-          style={{ objectFit: 'contain' }}
+          style={{ objectFit: "contain" }}
         />
       </div>
       <nav className="absolute left-[50%] top-[50%] transform translate-x-[-50%] translate-y-[-50%] hidden lg:block">

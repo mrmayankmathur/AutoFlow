@@ -1,25 +1,26 @@
 "use client";
 
 import { ExecutionStatus } from "@prisma/client";
+import { formatDistanceToNow } from "date-fns";
 import {
-  CheckCircle2Icon,
-  ClockIcon,
-  Loader2Icon,
-  XCircleIcon,
+  AlertTriangleIcon,
   ArrowLeftIcon,
   CalendarIcon,
-  TimerIcon,
-  ZapIcon,
-  AlertTriangleIcon,
+  CheckCircle2Icon,
+  CheckIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  CheckIcon,
+  ClockIcon,
   CopyIcon,
+  Loader2Icon,
+  TimerIcon,
+  XCircleIcon,
+  ZapIcon,
 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,9 +34,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useSuspenseExecution } from "@/features/executions/hooks/use-executions";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSuspenseExecution } from "@/features/executions/hooks/use-executions";
 
 const GetStatusIcon = ({ status }: { status: ExecutionStatus }) => {
   switch (status) {
@@ -144,7 +144,8 @@ export const ExecutionView = ({ executionId }: { executionId: string }) => {
 
   const duration = execution.completedAt
     ? Math.round(
-        (execution.completedAt.getTime() - execution.startedAt.getTime()) / 1000
+        (execution.completedAt.getTime() - execution.startedAt.getTime()) /
+          1000,
       )
     : null;
 

@@ -1,10 +1,10 @@
 "use client";
 
-import * as React from "react";
-import { useTheme } from "next-themes";
-import { cn } from "@/lib/utils";
 import { Monitor, Moon, Sun } from "lucide-react";
 import Image from "next/image";
+import { useTheme } from "next-themes";
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 export function ThemeSelector() {
   const { theme, setTheme } = useTheme();
@@ -83,7 +83,7 @@ export function ThemeSelector() {
                   "flex lg:h-36 lg:w-72 md:h-36 md:w-72 h-38 w-74 cursor-pointer items-center justify-center rounded-lg border-2 border-transparent overflow-hidden transition-all hover:ring-2 hover:ring-neutral-400 hover:ring-offset-2 dark:hover:ring-neutral-600 dark:hover:ring-offset-neutral-900",
                   isActive
                     ? "ring-2 ring-neutral-950 ring-offset-2 dark:ring-neutral-200 dark:ring-offset-neutral-900"
-                    : "border-neutral-200 bg-neutral-200 dark:bg-neutral-800 dark:border-neutral-800"
+                    : "border-neutral-200 bg-neutral-200 dark:bg-neutral-800 dark:border-neutral-800",
                 )}
               >
                 {item.visual}
@@ -94,7 +94,7 @@ export function ThemeSelector() {
                     "h-4 w-4",
                     isActive
                       ? "text-neutral-950 dark:text-neutral-200"
-                      : "text-neutral-500 dark:text-neutral-400"
+                      : "text-neutral-500 dark:text-neutral-400",
                   )}
                 />
                 <p
@@ -102,7 +102,7 @@ export function ThemeSelector() {
                     "text-sm font-medium",
                     isActive
                       ? "text-neutral-950 dark:text-neutral-200"
-                      : "text-neutral-500 dark:text-neutral-400"
+                      : "text-neutral-500 dark:text-neutral-400",
                   )}
                 >
                   {item.label}

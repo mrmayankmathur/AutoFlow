@@ -1,42 +1,7 @@
 "use client";
 
-import { CredentialType } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import {
-  useCreateCredential,
-  useUpdateCredential,
-  useSuspenseCredential,
-} from "../hooks/use-credentials";
-import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { CredentialType } from "@prisma/client";
 import { motion } from "framer-motion";
 import {
   ArrowLeftIcon,
@@ -47,7 +12,42 @@ import {
   ShieldAlertIcon,
   SparklesIcon,
 } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
 import { cn } from "@/lib/utils";
+import {
+  useCreateCredential,
+  useSuspenseCredential,
+  useUpdateCredential,
+} from "../hooks/use-credentials";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -143,7 +143,7 @@ export const CredentialForm = ({ initialData }: CredentialFormProps) => {
             onError: (error) => {
               handleError(error);
             },
-          }
+          },
         );
       } else {
         await createCredential.mutateAsync(values, {
@@ -184,7 +184,7 @@ export const CredentialForm = ({ initialData }: CredentialFormProps) => {
             className={cn(
               "absolute -top-[150px] -right-[150px] w-[300px] h-[300px] rounded-full blur-3xl opacity-20 transition-colors duration-500 pointer-events-none",
               "bg-linear-to-br",
-              currentStyle.gradient
+              currentStyle.gradient,
             )}
           />
 
@@ -209,7 +209,7 @@ export const CredentialForm = ({ initialData }: CredentialFormProps) => {
               <div
                 className={cn(
                   "p-2.5 rounded-lg transition-colors duration-300",
-                  currentStyle.iconBg
+                  currentStyle.iconBg,
                 )}
               >
                 <ShieldAlertIcon className="size-7.5" />
@@ -321,7 +321,7 @@ export const CredentialForm = ({ initialData }: CredentialFormProps) => {
                             {...field}
                             className={cn(
                               "pl-9 bg-background/50 border-muted focus-visible:ring-offset-0 focus-visible:ring-1 font-mono text-sm",
-                              currentStyle.border // Dynamic border color on focus
+                              currentStyle.border, // Dynamic border color on focus
                             )}
                           />
                         </div>

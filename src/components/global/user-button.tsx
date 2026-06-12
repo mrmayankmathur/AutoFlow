@@ -1,8 +1,8 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 import { LogOut, Settings } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "../ui/button";
 
 type Props = {

@@ -1,11 +1,11 @@
-import SidebarShell from "@/components/global/sidebar/sidebar-shell";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
-import { redirect } from "next/navigation";
 import InfoBar from "@/components/global/infobar";
+import SidebarShell from "@/components/global/sidebar/sidebar-shell";
+import { auth } from "@/lib/auth";
 
 export default async function DashboardLayout({
   children,

@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
 import { motion } from "framer-motion";
+import type React from "react";
 import { cn } from "@/lib/utils";
 import { SparklesCore } from "./sparkles";
 
@@ -35,7 +35,7 @@ export const LampContainer = ({
     <div
       className={cn(
         "relative flex min-h-[800px] flex-col items-center justify-center overflow-hidden bg-neutral-950 w-full rounded-md z-0",
-        className
+        className,
       )}
     >
       <div className="relative flex w-full flex-1 scale-y-125 items-center justify-center isolate z-0 ">

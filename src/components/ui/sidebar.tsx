@@ -1,7 +1,10 @@
 "use client";
+import clsx from "clsx";
+import { Database, GitBranch, LucideMousePointerClick } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
@@ -9,9 +12,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { menuOptions } from "@/lib/constant";
-import clsx from "clsx";
-import { Separator } from "@/components/ui/separator";
-import { Database, GitBranch, LucideMousePointerClick } from "lucide-react";
 import { ModeToggle } from "../global/mode-toggle";
 
 type Props = {};
@@ -38,7 +38,7 @@ const MenuOptions = (props: Props) => {
                         {
                           "dark:bg-[#2F006B] bg-[#EEE0FF] ":
                             pathName === menuItem.href,
-                        }
+                        },
                       )}
                     >
                       <menuItem.Component

@@ -1,11 +1,11 @@
-import type { NodeExecutor } from "@/features/executions/types";
-import { NonRetriableError } from "inngest";
 import { generateText } from "ai";
 import Handlebars from "handlebars";
+import { NonRetriableError } from "inngest";
+import type { NodeExecutor } from "@/features/executions/types";
 import { openAIChannel } from "@/inngest/channels/openai";
+import { getAIModel } from "@/lib/ai/factory";
 import { prisma } from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
-import { getAIModel } from "@/lib/ai/factory";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -35,7 +35,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
     openAIChannel().status({
       nodeId,
       status: "loading",
-    })
+    }),
   );
 
   if (!data.variableName) {
@@ -43,7 +43,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
       openAIChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("OPENAI NODE: Variable name is required");
@@ -54,7 +54,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
       openAIChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("OPENAI NODE: Credential is required");
@@ -65,7 +65,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
       openAIChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("OPENAI NODE: User prompt is required");
@@ -91,7 +91,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
       openAIChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("OPENAI NODE: Credential not found");
@@ -101,7 +101,6 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
     provider: "OPENAI",
     apiKey: decrypt(credential.value),
     modelOverride: data.model,
-
   });
 
   try {
@@ -123,7 +122,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
       openAIChannel().status({
         nodeId,
         status: "success",
-      })
+      }),
     );
 
     return {
@@ -137,7 +136,7 @@ export const openAIExecutor: NodeExecutor<OpenAIData> = async ({
       openAIChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw error;

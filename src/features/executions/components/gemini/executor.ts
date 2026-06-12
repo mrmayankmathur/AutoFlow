@@ -1,11 +1,11 @@
-import type { NodeExecutor } from "@/features/executions/types";
-import { NonRetriableError } from "inngest";
 import { generateText } from "ai";
 import Handlebars from "handlebars";
+import { NonRetriableError } from "inngest";
+import type { NodeExecutor } from "@/features/executions/types";
 import { geminiChannel } from "@/inngest/channels/gemini";
+import { type AIProvider, getAIModel } from "@/lib/ai/factory";
 import { prisma } from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
-import { getAIModel, type AIProvider } from "@/lib/ai/factory";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -34,7 +34,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
     geminiChannel().status({
       nodeId,
       status: "loading",
-    })
+    }),
   );
 
   if (!data.variableName) {
@@ -42,7 +42,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
       geminiChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("GEMINI NODE: Variable name is required");
@@ -53,7 +53,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
       geminiChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("GEMINI NODE: Credential is required");
@@ -64,7 +64,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
       geminiChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("GEMINI NODE: User prompt is required");
@@ -90,7 +90,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
       geminiChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("GEMINI NODE: Credential not found");
@@ -122,7 +122,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
     if (!text) {
       console.warn(
         "Gemini Executor: No text generated.",
-        `Steps count: ${steps?.length ?? 0}, First step content types: ${steps?.[0]?.content?.map((c: { type: string }) => c.type).join(", ") ?? "none"}`
+        `Steps count: ${steps?.length ?? 0}, First step content types: ${steps?.[0]?.content?.map((c: { type: string }) => c.type).join(", ") ?? "none"}`,
       );
     }
 
@@ -130,7 +130,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
       geminiChannel().status({
         nodeId,
         status: "success",
-      })
+      }),
     );
 
     return {
@@ -144,7 +144,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
       geminiChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw error;

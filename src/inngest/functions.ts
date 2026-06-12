@@ -1,18 +1,18 @@
-import { NonRetriableError } from "inngest";
-import { inngest } from "./client";
-import { prisma } from "@/lib/db";
 import { ExecutionStatus, NodeType } from "@prisma/client";
+import { NonRetriableError } from "inngest";
 import { getExecutor } from "@/features/executions/lib/executor-registry";
-import { httpRequestChannel } from "./channels/http-request";
-import { manualTriggerChannel } from "./channels/manual-trigger";
-import { googleFormTriggerChannel } from "./channels/google-form-trigger";
-import { stripeTriggerChannel } from "./channels/stripe-trigger";
-import { geminiChannel } from "./channels/gemini";
-import { openAIChannel } from "./channels/openai";
+import { prisma } from "@/lib/db";
+import { aiClassifierChannel } from "./channels/ai-classifier";
 import { anthropicChannel } from "./channels/anthropic";
 import { discordChannel } from "./channels/discord";
+import { geminiChannel } from "./channels/gemini";
+import { googleFormTriggerChannel } from "./channels/google-form-trigger";
+import { httpRequestChannel } from "./channels/http-request";
+import { manualTriggerChannel } from "./channels/manual-trigger";
+import { openAIChannel } from "./channels/openai";
 import { slackChannel } from "./channels/slack";
-import { aiClassifierChannel } from "./channels/ai-classifier";
+import { stripeTriggerChannel } from "./channels/stripe-trigger";
+import { inngest } from "./client";
 
 export const executeWorkflow = inngest.createFunction(
   {
@@ -52,7 +52,7 @@ export const executeWorkflow = inngest.createFunction(
 
     if (!inngestEventId || !workflowId) {
       throw new NonRetriableError(
-        "Inngest event ID or Workflow ID is required"
+        "Inngest event ID or Workflow ID is required",
       );
     }
 
@@ -77,7 +77,7 @@ export const executeWorkflow = inngest.createFunction(
             connections: true,
           },
         });
-      }
+      },
     );
 
     let context = event.data.initialData || {};
@@ -87,7 +87,7 @@ export const executeWorkflow = inngest.createFunction(
         n.type === NodeType.MANUAL_TRIGGER ||
         n.type === NodeType.INITIAL ||
         n.type === NodeType.GOOGLE_FORM_TRIGGER ||
-        n.type === NodeType.STRIPE_TRIGGER
+        n.type === NodeType.STRIPE_TRIGGER,
     );
 
     const executionQueue: string[] = entryNodes.map((n) => n.id);
@@ -98,7 +98,7 @@ export const executeWorkflow = inngest.createFunction(
     while (executionQueue.length > 0) {
       if (executionSteps >= MAX_STEPS) {
         console.warn(
-          "Workflow execution exceeded max steps (infinite loop protection)"
+          "Workflow execution exceeded max steps (infinite loop protection)",
         );
         break;
       }
@@ -112,7 +112,7 @@ export const executeWorkflow = inngest.createFunction(
 
       const executor = getExecutor(node.type as NodeType);
 
-      let executionResult = await executor({
+      const executionResult = await executor({
         data: node.data as Record<string, unknown>,
         nodeId: node.id,
         context,
@@ -126,7 +126,7 @@ export const executeWorkflow = inngest.createFunction(
 
       // Type guard for structured execution results
       const isStructuredResult = (
-        res: unknown
+        res: unknown,
       ): res is {
         nextHandle?: string;
         stop?: boolean;
@@ -163,7 +163,7 @@ export const executeWorkflow = inngest.createFunction(
       }
 
       const outgoingConnections = connections.filter(
-        (c) => c.fromNodeId === currentNodeId && c.fromOutput === nextHandle
+        (c) => c.fromNodeId === currentNodeId && c.fromOutput === nextHandle,
       );
 
       for (const connection of outgoingConnections) {
@@ -186,5 +186,5 @@ export const executeWorkflow = inngest.createFunction(
     });
 
     return { workflowId, result: context };
-  }
+  },
 );

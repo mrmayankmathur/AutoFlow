@@ -1,5 +1,5 @@
-import { useTRPC } from "@/trpc/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/client";
 import { useExecutionsParams } from "./use-executions-params";
 
 export const useSuspenseExecutions = () => {

@@ -23,7 +23,9 @@ const loadSentry = async () => {
 if (typeof window !== "undefined") {
   // Only boot Sentry session replay after the browser completes the immediate Next.js task loads!
   // This defers the ~200kb Sentry payload from blocking the visual DOM render.
-  window.requestIdleCallback ? window.requestIdleCallback(loadSentry) : setTimeout(loadSentry, 500);
+  window.requestIdleCallback
+    ? window.requestIdleCallback(loadSentry)
+    : setTimeout(loadSentry, 500);
 }
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

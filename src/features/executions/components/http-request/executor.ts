@@ -1,7 +1,7 @@
-import type { NodeExecutor } from "@/features/executions/types";
+import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
 import ky, { type Options as KyOptions } from "ky";
-import Handlebars from "handlebars";
+import type { NodeExecutor } from "@/features/executions/types";
 import { httpRequestChannel } from "@/inngest/channels/http-request";
 
 Handlebars.registerHelper("json", (context) => {
@@ -29,7 +29,7 @@ export const httpRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
     httpRequestChannel().status({
       nodeId,
       status: "loading",
-    })
+    }),
   );
 
   try {
@@ -39,7 +39,7 @@ export const httpRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
           httpRequestChannel().status({
             nodeId,
             status: "error",
-          })
+          }),
         );
 
         throw new NonRetriableError("HTTP Request node requires an endpoint!");
@@ -50,7 +50,7 @@ export const httpRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
           httpRequestChannel().status({
             nodeId,
             status: "error",
-          })
+          }),
         );
 
         throw new NonRetriableError("Variable name is required!");
@@ -61,7 +61,7 @@ export const httpRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
           httpRequestChannel().status({
             nodeId,
             status: "error",
-          })
+          }),
         );
 
         throw new NonRetriableError("HTTP method is required!");
@@ -105,7 +105,7 @@ export const httpRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
       httpRequestChannel().status({
         nodeId,
         status: "success",
-      })
+      }),
     );
 
     return result;
@@ -114,7 +114,7 @@ export const httpRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
       httpRequestChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw error;

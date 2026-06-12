@@ -1,10 +1,14 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { User } from "@prisma/client";
+import { CheckCircle2, Loader2, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { EditUserProfileSchema } from "@/lib/types";
+import { toast } from "sonner";
+import type { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,11 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, Mail } from "lucide-react";
-import { User } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { EditUserProfileSchema } from "@/lib/types";
 
 type Props = {
   user: User | null;
@@ -41,7 +41,7 @@ const ProfileForm = ({ user, onUpdate, onVerifyEmail }: Props) => {
   });
 
   const handleSubmit = async (
-    values: z.infer<typeof EditUserProfileSchema>
+    values: z.infer<typeof EditUserProfileSchema>,
   ) => {
     setIsLoading(true);
     try {

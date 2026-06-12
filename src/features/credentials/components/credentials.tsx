@@ -1,22 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { type Credential, CredentialType } from "@prisma/client";
 import { formatDistanceToNow } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  CalendarIcon,
+  FilterIcon,
+  FolderKeyIcon,
+  MoreVerticalIcon,
+  PlusIcon,
+  SearchIcon,
+  ShieldCheckIcon,
+  TrashIcon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Credential, CredentialType } from "@prisma/client";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  TrashIcon,
-  CalendarIcon,
-  ShieldCheckIcon,
-  PlusIcon,
-  SearchIcon,
-  MoreVerticalIcon,
-  FilterIcon,
-  FolderKeyIcon,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { EntityPagination, ErrorView } from "@/components/entity-components";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,14 +28,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ErrorView, EntityPagination } from "@/components/entity-components";
-import {
-  useRemoveCredential,
-  useSuspenseCredentials,
-} from "../hooks/use-credentials";
-import { useCredentialsParams } from "../hooks/use-credentials-params";
-import { useEntitySearch } from "@/hooks/use-entity-search";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -42,15 +35,21 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEntitySearch } from "@/hooks/use-entity-search";
+import { cn } from "@/lib/utils";
+import {
+  useRemoveCredential,
+  useSuspenseCredentials,
+} from "../hooks/use-credentials";
+import { useCredentialsParams } from "../hooks/use-credentials-params";
 
 const CredentialLogos: Record<CredentialType, string> = {
   [CredentialType.OPENAI]: "/logos/openai.svg",
@@ -133,7 +132,7 @@ export const CredentialsFilterBar = ({
               "px-4 py-1.5 text-sm font-medium rounded-lg transition-all duration-200",
               currentFilter === filter.value
                 ? "bg-background text-foreground hover:bg-background shadow-sm"
-                : "text-muted-foreground bg-transparent hover:text-foreground hover:bg-muted"
+                : "text-muted-foreground bg-transparent hover:text-foreground hover:bg-muted",
             )}
           >
             {filter.label}
@@ -308,14 +307,14 @@ export const CredentialCard = ({ data }: { data: Credential }) => {
         className={cn(
           "relative group flex flex-col h-full overflow-hidden cursor-pointer border transition-all duration-300",
           "bg-card hover:border-primary/40 hover:shadow-lg dark:hover:shadow-primary/5",
-          removeCredential.isPending && "opacity-50 pointer-events-none"
+          removeCredential.isPending && "opacity-50 pointer-events-none",
         )}
       >
         <div
           className={cn(
             "absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl transition-opacity duration-500 bg-linear-to-br to-transparent pointer-events-none z-0",
             style.gradient,
-            "opacity-60 group-hover:opacity-100"
+            "opacity-60 group-hover:opacity-100",
           )}
         />
 
@@ -332,7 +331,7 @@ export const CredentialCard = ({ data }: { data: Credential }) => {
           <div
             className={cn(
               "size-12 rounded-xl flex items-center justify-center border transition-colors",
-              style.iconBg
+              style.iconBg,
             )}
           >
             <Image src={logo} alt={data.type} width={24} height={24} />
@@ -370,7 +369,7 @@ export const CredentialCard = ({ data }: { data: Credential }) => {
           <h3
             className={cn(
               "font-semibold text-lg leading-none tracking-tight",
-              style.text
+              style.text,
             )}
           >
             {data.name}

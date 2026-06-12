@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import {
   ExecutionLoading,
   ExecutionView,
@@ -6,8 +8,6 @@ import { ExecutionsError } from "@/features/executions/components/executions";
 import { prefetchExecution } from "@/features/executions/server/prefetch";
 import { requireAuth } from "@/lib/auth-utils";
 import { HydrateClient } from "@/trpc/server";
-import { Suspense } from "react";
-import { ErrorBoundary } from "react-error-boundary";
 
 interface pageProps {
   params: Promise<{ executionId: string }>;

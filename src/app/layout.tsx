@@ -1,11 +1,11 @@
+import { Provider } from "jotai";
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
-import { TRPCReactProvider } from "@/trpc/client";
-import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/providers/theme-provider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Toaster } from "@/components/ui/sonner";
 import ModalProvider from "@/providers/modal-provider";
-import { Provider } from "jotai";
+import { ThemeProvider } from "@/providers/theme-provider";
+import { TRPCReactProvider } from "@/trpc/client";
 
 import "./globals.css";
 

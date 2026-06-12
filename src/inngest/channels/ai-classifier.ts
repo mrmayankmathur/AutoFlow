@@ -6,5 +6,5 @@ export const aiClassifierChannel = channel(AI_CLASSIFIER_CHANNEL_NAME).addTopic(
   topic("status").type<{
     nodeId: string;
     status: "loading" | "success" | "error";
-  }>()
+  }>(),
 );

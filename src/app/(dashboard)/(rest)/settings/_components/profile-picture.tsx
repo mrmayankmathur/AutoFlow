@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import { FileUpload } from "@/components/global/file-upload";
-import { useRouter } from "next/navigation";
+import { Loader2, X } from "lucide-react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { X, Loader2 } from "lucide-react";
-import { useUploadThing } from "@/lib/uploadthing";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import { toast } from "sonner";
+import { FileUpload } from "@/components/global/file-upload";
+import { Button } from "@/components/ui/button";
+import { useUploadThing } from "@/lib/uploadthing";
 
 type Props = {
   userImage: string | null;

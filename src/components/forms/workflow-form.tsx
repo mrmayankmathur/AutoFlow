@@ -1,16 +1,19 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Workflow } from "lucide-react"; // Import Workflow icon
 import { useRouter } from "next/navigation";
 import { generateSlug } from "random-word-slugs";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import {
   Form,
@@ -21,11 +24,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Loader2, Workflow } from "lucide-react"; // Import Workflow icon
-import { useModal } from "@/providers/modal-provider";
 import { useCreateWorkflow } from "@/features/workflows/hooks/use-workflows";
-import { useEffect, useState } from "react";
+import { useModal } from "@/providers/modal-provider";
 
 // 1. Updated Schema (Name only)
 export const WorkflowFormSchema = z.object({
@@ -66,7 +66,7 @@ const WorkflowForm = ({ subTitle, title }: Props) => {
           router.refresh();
           setClose();
         },
-      }
+      },
     );
   };
 

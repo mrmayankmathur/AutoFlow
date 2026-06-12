@@ -1,7 +1,9 @@
 "use client";
 
 import { createId } from "@paralleldrive/cuid2";
+import { NodeType } from "@prisma/client";
 import { useReactFlow } from "@xyflow/react";
+import { GlobeIcon, MousePointerIcon } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -12,8 +14,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { NodeType } from "@prisma/client";
-import { GlobeIcon, MousePointerIcon } from "lucide-react";
 import { Separator } from "./ui/separator";
 
 export type NodeTypeOption = {
@@ -107,7 +107,7 @@ export function NodeSelector({
       if (selection.type === NodeType.MANUAL_TRIGGER) {
         const nodes = getNodes();
         const hasManualTriggers = nodes.some(
-          (node) => node.type === NodeType.MANUAL_TRIGGER
+          (node) => node.type === NodeType.MANUAL_TRIGGER,
         );
         if (hasManualTriggers) {
           toast.error("Only one manual trigger is allowed per flow.");
@@ -117,7 +117,7 @@ export function NodeSelector({
 
       setNodes((nodes) => {
         const hasInitialTriggers = nodes.some(
-          (node) => node.type === NodeType.INITIAL
+          (node) => node.type === NodeType.INITIAL,
         );
 
         const centerX = window.innerWidth / 2;
@@ -144,7 +144,7 @@ export function NodeSelector({
 
       onOpenChange(false);
     },
-    [setNodes, getNodes, screenToFlowPosition, onOpenChange]
+    [setNodes, getNodes, screenToFlowPosition, onOpenChange],
   );
 
   return (

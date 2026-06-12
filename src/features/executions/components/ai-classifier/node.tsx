@@ -1,18 +1,18 @@
 "use client";
 
 import {
-  useReactFlow,
   type Node,
   type NodeProps,
   Position,
+  useReactFlow,
 } from "@xyflow/react";
-import { memo, useCallback, useState, useMemo } from "react";
-import { BaseExecutionNode } from "../base-execution-node";
-import { AiClassifierFormValues, AiClassifierDialog } from "./dialog";
-import { useNodeStatus } from "../../hooks/use-node-status";
-import { AI_CLASSIFIER_CHANNEL_NAME } from "@/inngest/channels/ai-classifier";
-import { fetchAiClassifierRealtimeToken } from "./actions";
+import { memo, useCallback, useMemo, useState } from "react";
 import { BaseHandle } from "@/components/react-flow/base-handle";
+import { AI_CLASSIFIER_CHANNEL_NAME } from "@/inngest/channels/ai-classifier";
+import { useNodeStatus } from "../../hooks/use-node-status";
+import { BaseExecutionNode } from "../base-execution-node";
+import { fetchAiClassifierRealtimeToken } from "./actions";
+import { AiClassifierDialog, type AiClassifierFormValues } from "./dialog";
 
 type AiClassifierNodeData = {
   variableName?: string;
@@ -51,11 +51,11 @@ export const AiClassifierNode = memo(
               };
             }
             return node;
-          })
+          }),
         );
         setDialogOpen(false);
       },
-      [props.id, setNodes]
+      [props.id, setNodes],
     );
 
     const handleOpenSettings = useCallback(() => {
@@ -132,7 +132,7 @@ export const AiClassifierNode = memo(
       prev.positionAbsoluteY === next.positionAbsoluteY &&
       JSON.stringify(prev.data) === JSON.stringify(next.data)
     );
-  }
+  },
 );
 
 AiClassifierNode.displayName = "AiClassifierNode";

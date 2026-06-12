@@ -1,5 +1,6 @@
 "use client";
 
+import type { Workflow } from "@prisma/client";
 import { formatDistanceToNow } from "date-fns";
 import {
   Loader2,
@@ -14,7 +15,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
-
+import { EntityHeader, EntityPagination } from "@/components/entity-components";
+import WorkflowButton from "@/components/global/workflow-button";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,17 +34,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
+import { cn } from "@/lib/utils";
 import {
   useCreateWorkflow,
   useRemoveWorkflow,
   useSuspenseWorkflows,
 } from "../hooks/use-workflows";
 import { useWorkflowsParams } from "../hooks/use-workflows-params";
-import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
-import { Workflow } from "@prisma/client";
-import { cn } from "@/lib/utils";
-import { EntityHeader, EntityPagination } from "@/components/entity-components";
-import WorkflowButton from "@/components/global/workflow-button";
 
 // --- Components ---
 
@@ -131,7 +130,7 @@ export const WorkflowCard = ({ data }: { data: Workflow }) => {
       <div
         className={cn(
           "h-24 w-full bg-linear-to-r dark:opacity-50 opacity-65 dark:group-hover:opacity-80 group-hover:opacity-100 transition-opacity",
-          gradient
+          gradient,
         )}
       />
 

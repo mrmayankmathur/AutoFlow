@@ -10,7 +10,7 @@ export const googleFormTriggerExecutor: NodeExecutor<
     googleFormTriggerChannel().status({
       nodeId,
       status: "loading",
-    })
+    }),
   );
 
   const result = await step.run("google-form-trigger", async () => context);
@@ -19,7 +19,7 @@ export const googleFormTriggerExecutor: NodeExecutor<
     googleFormTriggerChannel().status({
       nodeId,
       status: "success",
-    })
+    }),
   );
 
   return result;

@@ -1,7 +1,7 @@
 "use client";
 
-import { type ReactNode } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, type NodeProps, Position } from "@xyflow/react";
+import type { ReactNode } from "react";
 
 import { BaseNode } from "@/components/react-flow/base-node";
 

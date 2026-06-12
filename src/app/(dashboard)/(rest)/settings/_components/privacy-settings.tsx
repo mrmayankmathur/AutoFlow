@@ -1,7 +1,7 @@
 "use client";
 
+import { EyeOff, FileKey, Lock, Server, Shield } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Lock, EyeOff, FileKey, Server } from "lucide-react";
 
 export const PrivacySettings = () => {
   return (

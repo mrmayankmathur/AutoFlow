@@ -1,9 +1,9 @@
 "use server";
 
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
 async function getSession() {
   const session = await auth.api.getSession({
@@ -167,8 +167,8 @@ export async function getUserStats() {
         const activeSub = customer.activeSubscriptions[0];
         // Access product name safely - the structure may vary by SDK version
         subscriptionStatus =
-          (activeSub as any).product?.name ||
-          (activeSub as any).productName ||
+          (activeSub as Record<string, any>).product?.name ||
+          (activeSub as Record<string, unknown>).productName ||
           "Premium Plan";
       }
     } catch (polarError) {

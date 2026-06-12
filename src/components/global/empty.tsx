@@ -1,6 +1,6 @@
+import type { LucideIcon } from "lucide-react";
 import * as React from "react";
 import { cn } from "@/lib/utils"; // Assuming you have the standard utils
-import { LucideIcon } from "lucide-react";
 
 // --- 1. Container ---
 interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -23,7 +23,7 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
         className={cn(
           "flex flex-col items-center justify-center rounded-xl border p-8 text-center animate-in fade-in-50 zoom-in-95 duration-300",
           variants[variant],
-          className
+          className,
         )}
         {...props}
       >
@@ -32,7 +32,7 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 EmptyState.displayName = "EmptyState";
 
@@ -69,7 +69,7 @@ const EmptyStateTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "mt-2 text-xl font-semibold tracking-tight text-foreground",
-      className
+      className,
     )}
     {...props}
   />
@@ -84,7 +84,7 @@ const EmptyStateDescription = React.forwardRef<
     ref={ref}
     className={cn(
       "mt-2 text-sm text-muted-foreground leading-relaxed max-w-sm",
-      className
+      className,
     )}
     {...props}
   />
@@ -100,7 +100,7 @@ const EmptyStateActions = React.forwardRef<
     ref={ref}
     className={cn(
       "mt-8 flex flex-col sm:flex-row items-center gap-3",
-      className
+      className,
     )}
     {...props}
   />

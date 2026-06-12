@@ -1,7 +1,7 @@
 "use client";
-import React, { useRef } from "react";
-import { useScroll, useTransform, motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
+import React, { useRef } from "react";
 
 export const ContainerScroll = ({
   titleComponent,

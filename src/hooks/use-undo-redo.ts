@@ -1,12 +1,12 @@
-import { useCallback, useState } from "react";
 import {
-  Edge,
-  Node,
-  NodeChange,
-  EdgeChange,
-  applyNodeChanges,
   applyEdgeChanges,
+  applyNodeChanges,
+  type Edge,
+  type EdgeChange,
+  type Node,
+  type NodeChange,
 } from "@xyflow/react";
+import { useCallback, useState } from "react";
 
 type HistoryItem = {
   nodes: Node[];
@@ -51,14 +51,14 @@ export const useUndoRedo = (initialNodes: Node[], initialEdges: Edge[]) => {
     (changes: NodeChange[]) => {
       setNodes((prev) => applyNodeChanges(changes, prev));
     },
-    [setNodes]
+    [setNodes],
   );
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       setEdges((prev) => applyEdgeChanges(changes, prev));
     },
-    [setEdges]
+    [setEdges],
   );
 
   return {

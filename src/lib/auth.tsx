@@ -1,16 +1,16 @@
-import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma } from "@/lib/db";
-import { Resend } from "resend";
-import { VerifyEmailTemplate } from "@/components/global/emails/verify-email";
-import { polarClient } from "./polar";
 import {
-  polar,
   checkout,
+  polar,
   portal,
   usage,
   webhooks,
 } from "@polar-sh/better-auth";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { Resend } from "resend";
+import { VerifyEmailTemplate } from "@/components/global/emails/verify-email";
+import { prisma } from "@/lib/db";
+import { polarClient } from "./polar";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 

@@ -1,14 +1,21 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import type { NodeType } from "@prisma/client";
+import { useAtomValue } from "jotai";
 import { Book, Headphones, Loader2Icon, SaveIcon } from "lucide-react";
-import { NodeType } from "@prisma/client";
-import { Input } from "@/components/ui/input";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import UserButton from "@/components/global/user-button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,29 +24,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import UserButton from "@/components/global/user-button";
-import { useWorkflowsParams } from "@/features/workflows/hooks/use-workflows-params";
-import { useEntitySearch } from "@/hooks/use-entity-search";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import Link from "next/link";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   useSuspenseWorkflow,
   useUpdateWorkflow,
   useUpdateWorkflowName,
 } from "@/features/workflows/hooks/use-workflows";
-import { useAtomValue } from "jotai";
+import { useWorkflowsParams } from "@/features/workflows/hooks/use-workflows-params";
+import { useEntitySearch } from "@/hooks/use-entity-search";
+import { authClient } from "@/lib/auth-client";
 import { editorAtom } from "../store/atoms";
-import { toast } from "sonner";
 
 type Props = {
   workflowId: string;

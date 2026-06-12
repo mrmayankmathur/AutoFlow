@@ -1,6 +1,23 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Bot,
+  Gamepad2,
+  Layers,
+  Link,
+  MessageSquare,
+  Terminal,
+  UserCircle,
+  Variable,
+  Webhook,
+} from "lucide-react";
+import Image from "next/image";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import z from "zod";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,23 +36,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Bot,
-  Gamepad2,
-  Layers,
-  Link,
-  MessageSquare,
-  Terminal,
-  UserCircle,
-  Variable,
-  Webhook,
-} from "lucide-react";
-import Image from "next/image";
 
 export type DiscordFormValues = z.infer<typeof formSchema>;
 

@@ -1,22 +1,22 @@
 "use client";
 
-import ProfileForm from "@/components/forms/profile-form";
-import { useState } from "react";
-import ProfilePicture from "./profile-picture";
-import { ThemeSelector } from "./theme-selector";
+import type { User as PrismaUser } from "@prisma/client";
 import {
-  Settings as SettingsIcon,
-  User,
-  Moon,
-  Lock,
   Bell,
+  Lock,
+  Moon,
+  Settings as SettingsIcon,
   Shield,
+  User,
 } from "lucide-react";
-import { User as PrismaUser } from "@prisma/client";
+import { useState } from "react";
+import ProfileForm from "@/components/forms/profile-form";
 import { cn } from "@/lib/utils";
 import { AccountSettings } from "./account-settings";
 import { NotificationsSettings } from "./notifications-settings";
 import { PrivacySettings } from "./privacy-settings";
+import ProfilePicture from "./profile-picture";
+import { ThemeSelector } from "./theme-selector";
 
 type Props = {
   user: PrismaUser | null;
@@ -90,7 +90,7 @@ export const SettingsClient = ({
                   "flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer w-full text-left",
                   activeTab === item.id
                     ? "bg-white dark:bg-[#1f212b] shadow-sm border border-neutral-200/50 dark:border-neutral-800"
-                    : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                    : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200",
                 )}
               >
                 <item.icon
@@ -98,7 +98,7 @@ export const SettingsClient = ({
                     "h-5 w-5",
                     activeTab === item.id
                       ? "text-neutral-900 dark:text-white"
-                      : ""
+                      : "",
                   )}
                 />
                 <span
@@ -106,7 +106,7 @@ export const SettingsClient = ({
                     "font-medium",
                     activeTab === item.id
                       ? "text-neutral-900 dark:text-white"
-                      : ""
+                      : "",
                   )}
                 >
                   {item.label}

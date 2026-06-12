@@ -1,6 +1,6 @@
+import { headers } from "next/headers";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { auth } from "@/lib/auth"; // Your Better Auth instance
-import { headers } from "next/headers";
 
 const f = createUploadthing();
 

@@ -1,6 +1,7 @@
 "use client";
-import React, { useEffect, useState } from "react";
 import { Book, Headphones, Search } from "lucide-react";
+import { usePathname } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Tooltip,
@@ -8,12 +9,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { authClient } from "@/lib/auth-client";
-import { usePathname } from "next/navigation";
-import UserButton from "../user-button";
+import { useCredentialsParams } from "@/features/credentials/hooks/use-credentials-params";
 import { useWorkflowsParams } from "@/features/workflows/hooks/use-workflows-params";
 import { useEntitySearch } from "@/hooks/use-entity-search";
-import { useCredentialsParams } from "@/features/credentials/hooks/use-credentials-params";
+import { authClient } from "@/lib/auth-client";
+import UserButton from "../user-button";
 
 type Props = {};
 

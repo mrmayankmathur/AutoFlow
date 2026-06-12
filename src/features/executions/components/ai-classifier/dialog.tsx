@@ -1,5 +1,27 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createId } from "@paralleldrive/cuid2";
+import { CredentialType } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
+import {
+  ArrowRight,
+  BrainCircuit,
+  GitFork,
+  KeyRound,
+  Layers,
+  Plus,
+  Sparkles,
+  Split,
+  Tag,
+  Terminal,
+  Trash2,
+  Variable,
+} from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { z } from "zod";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,7 +40,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -26,29 +47,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray } from "react-hook-form";
-import { z } from "zod";
-import { useQuery } from "@tanstack/react-query";
+import { Textarea } from "@/components/ui/textarea";
 import { useTRPC } from "@/trpc/client";
-import { CredentialType } from "@prisma/client";
-import {
-  ArrowRight,
-  BrainCircuit,
-  GitFork,
-  KeyRound,
-  Layers,
-  Plus,
-  Sparkles,
-  Split,
-  Tag,
-  Terminal,
-  Trash2,
-  Variable,
-} from "lucide-react";
-import { createId } from "@paralleldrive/cuid2";
-import { useEffect, useMemo } from "react";
-import { Badge } from "@/components/ui/badge";
 
 const formSchema = z
   .object({
@@ -65,7 +65,7 @@ const formSchema = z
         z.object({
           id: z.string().min(1, "Route ID is required"),
           label: z.string().min(1, "Label is required"),
-        })
+        }),
       )
       .min(1, "At least one route is required"),
     input: z.string().min(1, "Input text is required"),
@@ -81,7 +81,7 @@ const formSchema = z
     {
       message: "Model is required when a credential is selected",
       path: ["model"],
-    }
+    },
   );
 
 export type AiClassifierFormValues = z.infer<typeof formSchema>;
@@ -137,7 +137,7 @@ export function AiClassifierDialog({
   // Memoize the defaultValues string to avoid re-evaluation on every render
   const defaultValuesKey = useMemo(
     () => JSON.stringify(defaultValues),
-    [defaultValues]
+    [defaultValues],
   );
 
   useEffect(() => {
@@ -167,13 +167,13 @@ export function AiClassifierDialog({
   });
 
   const { data: credentials, isLoading: isLoadingCredentials } = useQuery(
-    trpc.credentials.getMany.queryOptions({})
+    trpc.credentials.getMany.queryOptions({}),
   );
 
   const filteredCredentials = useMemo(() => {
     return credentials?.items?.filter(
       (c) =>
-        c.type === CredentialType.GEMINI || c.type === CredentialType.OPENAI
+        c.type === CredentialType.GEMINI || c.type === CredentialType.OPENAI,
     );
   }, [credentials]);
 
@@ -181,7 +181,7 @@ export function AiClassifierDialog({
     if (!selectedCredentialId || !filteredCredentials) return [];
 
     const selectedCredential = filteredCredentials.find(
-      (c) => c.id === selectedCredentialId
+      (c) => c.id === selectedCredentialId,
     );
 
     if (!selectedCredential) return [];
@@ -195,7 +195,7 @@ export function AiClassifierDialog({
     if (availableModels.length > 0) {
       const currentModel = form.getValues("model");
       const isModelValid = availableModels.some(
-        (m) => m.value === currentModel
+        (m) => m.value === currentModel,
       );
 
       if (!currentModel || !isModelValid) {

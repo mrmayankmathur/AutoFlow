@@ -1,28 +1,28 @@
 "use client";
 
+import type { Execution } from "@prisma/client";
+import { ExecutionStatus } from "@prisma/client";
 import { format, formatDistanceToNow } from "date-fns";
 import {
+  CalendarIcon,
+  CheckCircle2Icon,
+  ChevronRightIcon,
+  ClockIcon,
+  HashIcon,
+  Loader2Icon,
+  TimerIcon,
+  XCircleIcon,
+} from "lucide-react";
+import Link from "next/link";
+import {
+  EmptyView2,
   EntityHeader,
   EntityPagination,
   ErrorView,
-  EmptyView2,
 } from "@/components/entity-components";
+import { cn } from "@/lib/utils";
 import { useSuspenseExecutions } from "../hooks/use-executions";
 import { useExecutionsParams } from "../hooks/use-executions-params";
-import type { Execution } from "@prisma/client";
-import { ExecutionStatus } from "@prisma/client";
-import {
-  CheckCircle2Icon,
-  ClockIcon,
-  Loader2Icon,
-  XCircleIcon,
-  CalendarIcon,
-  TimerIcon,
-  ChevronRightIcon,
-  HashIcon,
-} from "lucide-react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 const StatusBadge = ({ status }: { status: ExecutionStatus }) => {
   const styles = {
@@ -53,7 +53,7 @@ const StatusBadge = ({ status }: { status: ExecutionStatus }) => {
     <div
       className={cn(
         "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
-        currentStyle
+        currentStyle,
       )}
     >
       {currentIcon}

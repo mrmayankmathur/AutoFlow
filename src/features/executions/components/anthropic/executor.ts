@@ -1,11 +1,11 @@
-import type { NodeExecutor } from "@/features/executions/types";
-import { NonRetriableError } from "inngest";
 import { generateText } from "ai";
 import Handlebars from "handlebars";
+import { NonRetriableError } from "inngest";
+import type { NodeExecutor } from "@/features/executions/types";
 import { anthropicChannel } from "@/inngest/channels/anthropic";
+import { type AIProvider, getAIModel } from "@/lib/ai/factory";
 import { prisma } from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
-import { getAIModel, type AIProvider } from "@/lib/ai/factory";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -34,7 +34,7 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
     anthropicChannel().status({
       nodeId,
       status: "loading",
-    })
+    }),
   );
 
   if (!data.variableName) {
@@ -42,7 +42,7 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
       anthropicChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("ANTHROPIC NODE: Variable name is required");
@@ -53,7 +53,7 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
       anthropicChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("ANTHROPIC NODE: Credential is required");
@@ -64,7 +64,7 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
       anthropicChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("ANTHROPIC NODE: User prompt is required");
@@ -90,7 +90,7 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
       anthropicChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("ANTHROPIC NODE: Credential not found");
@@ -115,7 +115,7 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
           recordInputs: true,
           recordOutputs: true,
         },
-      }
+      },
     );
 
     const text =
@@ -125,7 +125,7 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
       anthropicChannel().status({
         nodeId,
         status: "success",
-      })
+      }),
     );
 
     return {
@@ -139,7 +139,7 @@ export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({
       anthropicChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw error;

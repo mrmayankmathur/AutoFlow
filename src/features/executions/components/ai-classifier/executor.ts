@@ -1,14 +1,14 @@
-import type { NodeExecutor } from "@/features/executions/types";
-import { NonRetriableError } from "inngest";
-import { generateObject } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
+import { CredentialType } from "@prisma/client";
+import { generateObject } from "ai";
 import Handlebars from "handlebars";
+import { NonRetriableError } from "inngest";
+import { z } from "zod";
+import type { NodeExecutor } from "@/features/executions/types";
 import { aiClassifierChannel } from "@/inngest/channels/ai-classifier";
 import { prisma } from "@/lib/db";
 import { decrypt } from "@/lib/encryption";
-import { CredentialType } from "@prisma/client";
-import { z } from "zod";
 
 type AiClassifierData = {
   variableName?: string;
@@ -30,7 +30,7 @@ export const aiClassifierExecutor: NodeExecutor<AiClassifierData> = async ({
     aiClassifierChannel().status({
       nodeId,
       status: "loading",
-    })
+    }),
   );
 
   if (
@@ -43,7 +43,7 @@ export const aiClassifierExecutor: NodeExecutor<AiClassifierData> = async ({
       aiClassifierChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
     throw new NonRetriableError("SMART ROUTER: Missing required configuration");
   }
@@ -62,7 +62,7 @@ export const aiClassifierExecutor: NodeExecutor<AiClassifierData> = async ({
       aiClassifierChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
     throw new NonRetriableError("SMART ROUTER: Credential not found");
   }
@@ -103,7 +103,7 @@ Provide a reasoning for your choice and a confidence score (0-1).`;
       aiClassifierChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
     throw new NonRetriableError("SMART ROUTER: Unsupported credential type");
   }
@@ -138,7 +138,7 @@ Provide a reasoning for your choice and a confidence score (0-1).`;
       aiClassifierChannel().status({
         nodeId,
         status: "success",
-      })
+      }),
     );
 
     return {
@@ -157,7 +157,7 @@ Provide a reasoning for your choice and a confidence score (0-1).`;
       aiClassifierChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
     throw error;
   }

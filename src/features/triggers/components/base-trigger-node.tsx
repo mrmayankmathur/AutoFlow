@@ -4,13 +4,13 @@ import { type NodeProps, Position, useReactFlow } from "@xyflow/react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { memo, type ReactNode } from "react";
-import { BaseNode, BaseNodeContent } from "@/components/react-flow/base-node";
 import { BaseHandle } from "@/components/react-flow/base-handle";
-import { WorkflowNode } from "@/components/workflow-node";
+import { BaseNode, BaseNodeContent } from "@/components/react-flow/base-node";
 import {
   type NodeStatus,
   NodeStatusIndicator,
 } from "@/components/react-flow/node-status-indicator";
+import { WorkflowNode } from "@/components/workflow-node";
 
 interface BaseTriggerNodeProps extends NodeProps {
   icon: LucideIcon | string;
@@ -42,7 +42,7 @@ export const BaseTriggerNode = memo(
       });
       setEdges((edges) => {
         const updatedEdges = edges.filter(
-          (edge) => edge.source !== id && edge.target !== id
+          (edge) => edge.source !== id && edge.target !== id,
         );
         return updatedEdges;
       });
@@ -82,7 +82,7 @@ export const BaseTriggerNode = memo(
         </NodeStatusIndicator>
       </WorkflowNode>
     );
-  }
+  },
 );
 
 BaseTriggerNode.displayName = "BaseTriggerNode";

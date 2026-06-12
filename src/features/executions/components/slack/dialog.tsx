@@ -1,6 +1,21 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Hash,
+  Layers,
+  Link,
+  MessageCircle,
+  Terminal,
+  Variable,
+  Webhook,
+} from "lucide-react";
+import Image from "next/image";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import z from "zod";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,21 +34,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Hash,
-  Layers,
-  Link,
-  MessageCircle,
-  Terminal,
-  Variable,
-  Webhook,
-} from "lucide-react";
-import Image from "next/image";
 
 export type SlackFormValues = z.infer<typeof formSchema>;
 

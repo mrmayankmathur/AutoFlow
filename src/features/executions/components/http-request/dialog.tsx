@@ -1,6 +1,21 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  ArrowRightLeft,
+  Braces,
+  FileJson,
+  Globe,
+  Layers,
+  Network,
+  Terminal,
+  Variable,
+} from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import z from "zod";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -26,21 +41,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  ArrowRightLeft,
-  Braces,
-  FileJson,
-  Globe,
-  Layers,
-  Network,
-  Terminal,
-  Variable,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export type HTTPRequestFormValues = z.infer<typeof formSchema>;

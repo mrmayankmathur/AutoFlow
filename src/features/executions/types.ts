@@ -21,5 +21,5 @@ export type ExecutionResult = {
 };
 
 export type NodeExecutor<TData = Record<string, unknown>> = (
-  params: NodeExecutorParams<TData>
+  params: NodeExecutorParams<TData>,
 ) => Promise<ExecutionResult | WorkflowContext>;

@@ -1,7 +1,3 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import {
   AlertTriangleIcon,
   FolderOpenIcon,
@@ -12,21 +8,8 @@ import {
   SearchIcon,
   TrashIcon,
 } from "lucide-react";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
-import {
-  EmptyState,
-  EmptyStateActions,
-  EmptyStateDescription,
-  EmptyStateIcon,
-  EmptyStateTitle,
-} from "./global/empty";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -39,6 +22,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import {
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateIcon,
+  EmptyStateTitle,
+} from "./global/empty";
 
 type EntityHeaderProps = {
   title: string;
@@ -269,7 +269,7 @@ export const EntityList = <T,>({
     <div
       className={cn(
         "flex flex-col gap-y-4 px-8 md:px-10 -ml-5 lg:-ml-12 md:-ml-8 md:py-2",
-        className
+        className,
       )}
     >
       {items.map((item, index) => (
@@ -320,7 +320,7 @@ export const EntityItem = ({
         className={cn(
           "p-4 shadow-none hover:shadow cursor-pointer",
           isRemoving && "opacity-50 cursor-not-allowed",
-          className
+          className,
         )}
       >
         <CardContent className="flex flex-row items-center justify-between p-0">

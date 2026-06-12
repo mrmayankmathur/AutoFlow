@@ -1,5 +1,5 @@
-import { ConnectionProviderProps } from "@/providers/connections-provider";
 import { z } from "zod";
+import type { ConnectionProviderProps } from "@/providers/connections-provider";
 
 export const EditUserProfileSchema = z.object({
   email: z.string().email("Required"),

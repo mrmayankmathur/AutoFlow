@@ -1,14 +1,15 @@
 "use client";
-import { cn } from "@/lib/utils";
-import React, { useState, createContext, useContext } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
+import { AnimatePresence, motion } from "motion/react";
+import type React from "react";
+import { createContext, useContext, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 interface Links {
   label: string;
@@ -23,7 +24,7 @@ interface SidebarContextProps {
 }
 
 const SidebarContext = createContext<SidebarContextProps | undefined>(
-  undefined
+  undefined,
 );
 
 export const useSidebar = () => {
@@ -96,7 +97,7 @@ export const DesktopSidebar = ({
         "h-screen px-4 py-4 ml-2 hidden lg:flex lg:flex-col bg-neutral-100 dark:bg-neutral-800 shrink-0",
         // Fixed width for desktop (collapsed state)
         "w-[62px]",
-        className
+        className,
       )}
       {...props}
     >
@@ -114,7 +115,7 @@ export const MobileSidebar = ({
   return (
     <div
       className={cn(
-        "h-10 sm:px-1 md:px-4 py-4 flex flex-row lg:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800"
+        "h-10 sm:px-1 md:px-4 py-4 flex flex-row lg:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800",
       )}
       {...props}
     >
@@ -136,7 +137,7 @@ export const MobileSidebar = ({
             }}
             className={cn(
               "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-50 flex flex-col justify-between",
-              className
+              className,
             )}
           >
             <div
@@ -174,7 +175,7 @@ export const SidebarLink = ({
         isActive
           ? "light:text-black! font-bold rounded-lg hover:scale-105 dark:text-white! lg:bg-transparent! dark:hover:bg-neutral-700! light:hover:bg-neutral-200! light:sm:bg-amber-50! dark:sm:bg-neutral-700!"
           : "light:text-neutral-600/30 dark:text-neutral-600/60 light:hover:bg-neutral-200 dark:hover:bg-neutral-700/50 rounded-lg hover:scale-105 transition-all duration-150",
-        className
+        className,
       )}
       {...props}
     >

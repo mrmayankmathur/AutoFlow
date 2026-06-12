@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/db";
-import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { z } from "zod";
 import { PAGINATION } from "@/config/constants";
+import { prisma } from "@/lib/db";
+import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 export const executionsRouter = createTRPCRouter({
   getOne: protectedProcedure
@@ -34,7 +34,7 @@ export const executionsRouter = createTRPCRouter({
           .min(PAGINATION.MIN_PAGE_SIZE)
           .max(PAGINATION.MAX_PAGE_SIZE)
           .default(PAGINATION.DEFAULT_PAGE_SIZE),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
       const { page, pageSize } = input;

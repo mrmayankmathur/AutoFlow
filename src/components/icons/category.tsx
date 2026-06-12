@@ -20,7 +20,7 @@ function Category({ selected }: Props) {
         rx="3"
         className={clsx(
           "dark:group-hover:fill-[#C8C7FF] transition-all dark:fill-[#353346] fill-[#BABABB] group-hover:fill-[#7540A9]",
-          { "dark:fill-[#C8C7FF]! fill-[#7540A9] ": selected }
+          { "dark:fill-[#C8C7FF]! fill-[#7540A9] ": selected },
         )}
       />
       <rect
@@ -31,7 +31,7 @@ function Category({ selected }: Props) {
         rx="3"
         className={clsx(
           "dark:group-hover:fill-[#C8C7FF] transition-all dark:fill-[#353346] fill-[#BABABB] group-hover:fill-[#7540A9]",
-          { "dark:fill-[#C8C7FF]! fill-[#7540A9] ": selected }
+          { "dark:fill-[#C8C7FF]! fill-[#7540A9] ": selected },
         )}
       />
       <rect
@@ -42,7 +42,7 @@ function Category({ selected }: Props) {
         rx="3"
         className={clsx(
           "dark:group-hover:fill-[#C8C7FF] transition-all dark:fill-[#353346] fill-[#BABABB] group-hover:fill-[#7540A9]",
-          { "dark:fill-[#C8C7FF]! fill-[#7540A9] ": selected }
+          { "dark:fill-[#C8C7FF]! fill-[#7540A9] ": selected },
         )}
       />
       <rect
@@ -53,7 +53,7 @@ function Category({ selected }: Props) {
         rx="3"
         className={clsx(
           "dark:group-hover:fill-[#9F54FF] transition-all dark:fill-[#C0BFC4] fill-[#5B5966] group-hover:fill-[#BD8AFF] ",
-          { "dark:fill-[#7540A9]! fill-[#BD8AFF] ": selected }
+          { "dark:fill-[#7540A9]! fill-[#BD8AFF] ": selected },
         )}
       />
     </svg>

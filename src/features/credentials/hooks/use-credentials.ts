@@ -1,4 +1,4 @@
-import { useTRPC } from "@/trpc/client";
+import type { CredentialType } from "@prisma/client";
 import {
   useMutation,
   useQuery,
@@ -7,8 +7,8 @@ import {
 } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTRPC } from "@/trpc/client";
 import { useCredentialsParams } from "./use-credentials-params";
-import { CredentialType } from "@prisma/client";
 
 export const useSuspenseCredentials = () => {
   const trpc = useTRPC();
@@ -26,13 +26,13 @@ export const useCreateCredential = () => {
       onSuccess: (data) => {
         toast.success(`Credential "${data.name}" created successfully!`);
         queryClient.invalidateQueries(
-          trpc.credentials.getMany.queryOptions({})
+          trpc.credentials.getMany.queryOptions({}),
         );
       },
       onError: (error) => {
         toast.error(`Failed to create credential: ${error.message}`);
       },
-    })
+    }),
   );
 };
 
@@ -45,16 +45,16 @@ export const useUpdateCredential = () => {
       onSuccess: (data) => {
         toast.success(`Credential "${data.name}" saved successfully!`);
         queryClient.invalidateQueries(
-          trpc.credentials.getMany.queryOptions({})
+          trpc.credentials.getMany.queryOptions({}),
         );
         queryClient.invalidateQueries(
-          trpc.credentials.getOne.queryOptions({ id: data.id })
+          trpc.credentials.getOne.queryOptions({ id: data.id }),
         );
       },
       onError: (error) => {
         toast.error(`Failed to save credential: ${error.message}`);
       },
-    })
+    }),
   );
 };
 
@@ -67,16 +67,16 @@ export const useRemoveCredential = () => {
       onSuccess: (data) => {
         toast.success(`Credential "${data.name}" removed successfully!`);
         queryClient.invalidateQueries(
-          trpc.credentials.getMany.queryOptions({})
+          trpc.credentials.getMany.queryOptions({}),
         );
         queryClient.invalidateQueries(
-          trpc.credentials.getOne.queryFilter({ id: data.id })
+          trpc.credentials.getOne.queryFilter({ id: data.id }),
         );
       },
       onError: (error) => {
         toast.error(`Failed to remove credential: ${error.message}`);
       },
-    })
+    }),
   );
 };
 

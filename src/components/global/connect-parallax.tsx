@@ -1,14 +1,14 @@
 "use client";
-import React from "react";
 import {
+  type MotionValue,
   motion,
   useScroll,
-  useTransform,
   useSpring,
-  MotionValue,
+  useTransform,
 } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
 export const HeroParallax = ({
   products,
@@ -32,27 +32,27 @@ export const HeroParallax = ({
 
   const translateX = useSpring(
     useTransform(scrollYProgress, [0, 1], [0, 1000]),
-    springConfig
+    springConfig,
   );
   const translateXReverse = useSpring(
     useTransform(scrollYProgress, [0, 1], [0, -1000]),
-    springConfig
+    springConfig,
   );
   const rotateX = useSpring(
     useTransform(scrollYProgress, [0, 0.2], [15, 0]),
-    springConfig
+    springConfig,
   );
   const opacity = useSpring(
     useTransform(scrollYProgress, [0, 0.2], [0.2, 1]),
-    springConfig
+    springConfig,
   );
   const rotateZ = useSpring(
     useTransform(scrollYProgress, [0, 0.2], [20, 0]),
-    springConfig
+    springConfig,
   );
   const translateY = useSpring(
     useTransform(scrollYProgress, [0, 0.2], [-700, 500]),
-    springConfig
+    springConfig,
   );
   return (
     <div

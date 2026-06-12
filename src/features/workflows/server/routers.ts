@@ -1,18 +1,18 @@
+import { NodeType } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
+import type { Edge, Node } from "@xyflow/react";
 import { generateSlug } from "random-word-slugs";
+import { z } from "zod";
+import { PAGINATION } from "@/config/constants";
+import { inngest } from "@/inngest/client";
+import { sendWorkflowExecution } from "@/inngest/utils";
 import { prisma } from "@/lib/db";
 import { polarClient } from "@/lib/polar";
-import { TRPCError } from "@trpc/server";
 import {
   createTRPCRouter,
   premiumProcedure,
   protectedProcedure,
 } from "@/trpc/init";
-import { z } from "zod";
-import { PAGINATION } from "@/config/constants";
-import { NodeType } from "@prisma/client";
-import type { Node, Edge } from "@xyflow/react";
-import { inngest } from "@/inngest/client";
-import { sendWorkflowExecution } from "@/inngest/utils";
 
 const createWorkflowSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -44,8 +44,7 @@ export const workflowsRouter = createTRPCRouter({
       });
 
       const hasActiveSubscription =
-        customer.activeSubscriptions &&
-        customer.activeSubscriptions.length > 0;
+        customer.activeSubscriptions && customer.activeSubscriptions.length > 0;
 
       if (!hasActiveSubscription) {
         const workflowCount = await prisma.workflow.count({
@@ -55,7 +54,8 @@ export const workflowsRouter = createTRPCRouter({
         if (workflowCount >= 3) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Free plan is limited to 3 workflows. Upgrade to premium for unlimited workflows.",
+            message:
+              "Free plan is limited to 3 workflows. Upgrade to premium for unlimited workflows.",
           });
         }
       }
@@ -99,7 +99,7 @@ export const workflowsRouter = createTRPCRouter({
             type: z.nativeEnum(NodeType),
             position: z.object({ x: z.number(), y: z.number() }),
             data: z.record(z.string(), z.any()).optional(),
-          })
+          }),
         ),
         edges: z.array(
           z.object({
@@ -108,9 +108,9 @@ export const workflowsRouter = createTRPCRouter({
             target: z.string(),
             sourceHandle: z.string().nullish(),
             targetHandle: z.string().nullish(),
-          })
+          }),
         ),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const { id, nodes, edges } = input;
@@ -127,7 +127,7 @@ export const workflowsRouter = createTRPCRouter({
           // Delete connections that aren't in the incoming payload anymore
           if (edges.length > 0) {
             const incomingEdgeIds = edges.map(
-              (e) => e.id || `conn_${e.source}_${e.target}`
+              (e) => e.id || `conn_${e.source}_${e.target}`,
             );
             await tx.connection.deleteMany({
               where: {
@@ -168,8 +168,8 @@ export const workflowsRouter = createTRPCRouter({
                   position: node.position,
                   data: node.data || {},
                 },
-              })
-            )
+              }),
+            ),
           );
 
           // Upsert connections simultaneously
@@ -191,7 +191,7 @@ export const workflowsRouter = createTRPCRouter({
                   toInput: edge.targetHandle || "main",
                 },
               });
-            })
+            }),
           );
 
           await tx.workflow.update({
@@ -207,7 +207,7 @@ export const workflowsRouter = createTRPCRouter({
         },
         {
           timeout: 15000,
-        }
+        },
       );
     }),
 
@@ -274,7 +274,7 @@ export const workflowsRouter = createTRPCRouter({
           .max(PAGINATION.MAX_PAGE_SIZE)
           .default(PAGINATION.DEFAULT_PAGE_SIZE),
         search: z.string().default(""),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
       const { page, pageSize, search } = input;

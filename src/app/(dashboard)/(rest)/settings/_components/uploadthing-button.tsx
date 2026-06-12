@@ -1,8 +1,8 @@
 "use client";
-import React from "react";
-import { UploadButton } from "@/lib/uploadthing";
 import { useRouter } from "next/navigation";
+import React from "react";
 import { toast } from "sonner";
+import { UploadButton } from "@/lib/uploadthing";
 
 type Props = {
   onUpload: (url: string) => Promise<any>;

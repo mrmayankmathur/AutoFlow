@@ -1,12 +1,12 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/global/sidebar";
 import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 type SidebarActionButtonProps = {
   onClick?: () => void;
@@ -31,7 +31,7 @@ export const SidebarActionButton = ({
               "group flex h-10 items-center rounded-lg transition-colors",
               open ? "gap-x-4 px-4" : "justify-center px-4 -mx-1",
               "hover:bg-neutral-200 dark:hover:bg-neutral-700",
-              className
+              className,
             )}
           >
             {children}

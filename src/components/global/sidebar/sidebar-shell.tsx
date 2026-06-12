@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Sidebar, SidebarBody, SidebarLink } from "@/components/global/sidebar";
+import { motion } from "framer-motion";
 import {
   CreditCardIcon,
   FolderOpenIcon,
@@ -10,23 +9,24 @@ import {
   Settings,
   Sparkles,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ActionRail } from "@/components/global/sidebar/ActionRail";
-import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
 import { ModeToggle } from "@/components/global/mode-toggle";
+import { Sidebar, SidebarBody, SidebarLink } from "@/components/global/sidebar";
+import { ActionRail } from "@/components/global/sidebar/ActionRail";
 import { SidebarActionButton } from "@/components/global/sidebar/sidebar-action-button";
-import { motion } from "framer-motion";
-import UserButton from "../user-button";
-import { authClient } from "@/lib/auth-client";
-import { useHasActiveSubscription } from "@/features/subscriptions/hooks/use-subscription";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useHasActiveSubscription } from "@/features/subscriptions/hooks/use-subscription";
+import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
+import UserButton from "../user-button";
 
 type Props = {
   user?: {
@@ -161,7 +161,7 @@ export default function SidebarShell({ user, children }: Props) {
                 className={cn(
                   "-ml-[5px] flex items-center gap-2 border border-neutral-200 dark:border-neutral-700 px-2",
                   pathname === "/settings" &&
-                    "bg-neutral-200 dark:bg-neutral-600"
+                    "bg-neutral-200 dark:bg-neutral-600",
                 )}
               >
                 <Settings className="h-4 w-4 shrink-0" />
@@ -207,7 +207,7 @@ export default function SidebarShell({ user, children }: Props) {
             "rounded-tl-2xl",
             "border border-neutral-200 dark:border-neutral-700/50",
             "bg-white dark:bg-neutral-900",
-            "overflow-hidden"
+            "overflow-hidden",
           )}
         >
           <div className="h-full overflow-y-auto pt-0 px-0 sm:-px-6">

@@ -1,22 +1,15 @@
 "use client";
 
+import { Laptop, Loader2, Smartphone, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   deleteAccount,
   getActiveSessions,
-  revokeSession,
   getUserStats,
+  revokeSession,
 } from "@/actions/user-settings";
-import { Input } from "@/components/ui/input";
-
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,9 +22,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Laptop, Smartphone, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Session = {
@@ -56,7 +55,7 @@ export const AccountSettings = () => {
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [loadingStats, setLoadingStats] = useState(true);
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(
-    null
+    null,
   );
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");

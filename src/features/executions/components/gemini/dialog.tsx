@@ -1,6 +1,24 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CredentialType } from "@prisma/client";
+import {
+  Bot,
+  Cpu,
+  Fingerprint,
+  KeyRound,
+  Layers,
+  Sparkles,
+  Terminal,
+  Variable,
+  Wand2,
+} from "lucide-react";
+import Image from "next/image";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import z from "zod";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -26,25 +44,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
-import { CredentialType } from "@prisma/client";
-import Image from "next/image";
-import {
-  Bot,
-  Cpu,
-  Fingerprint,
-  KeyRound,
-  Layers,
-  Sparkles,
-  Terminal,
-  Variable,
-  Wand2,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 export type GeminiFormValues = z.infer<typeof formSchema>;
 

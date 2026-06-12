@@ -1,9 +1,9 @@
-import type { NodeExecutor } from "@/features/executions/types";
-import { NonRetriableError } from "inngest";
 import Handlebars from "handlebars";
 import { decode } from "html-entities";
-import { discordChannel } from "@/inngest/channels/discord";
+import { NonRetriableError } from "inngest";
 import ky from "ky";
+import type { NodeExecutor } from "@/features/executions/types";
+import { discordChannel } from "@/inngest/channels/discord";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -30,7 +30,7 @@ export const discordExecutor: NodeExecutor<DiscordNodeData> = async ({
     discordChannel().status({
       nodeId,
       status: "loading",
-    })
+    }),
   );
 
   if (!data.content) {
@@ -38,7 +38,7 @@ export const discordExecutor: NodeExecutor<DiscordNodeData> = async ({
       discordChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw new NonRetriableError("DISCORD NODE: Content is required");
@@ -57,7 +57,7 @@ export const discordExecutor: NodeExecutor<DiscordNodeData> = async ({
           discordChannel().status({
             nodeId,
             status: "error",
-          })
+          }),
         );
 
         throw new NonRetriableError("DISCORD NODE: Webhook URL is required");
@@ -75,7 +75,7 @@ export const discordExecutor: NodeExecutor<DiscordNodeData> = async ({
           discordChannel().status({
             nodeId,
             status: "error",
-          })
+          }),
         );
 
         throw new NonRetriableError("DISCORD NODE: Variable name is required");
@@ -93,7 +93,7 @@ export const discordExecutor: NodeExecutor<DiscordNodeData> = async ({
       discordChannel().status({
         nodeId,
         status: "success",
-      })
+      }),
     );
 
     return result;
@@ -102,7 +102,7 @@ export const discordExecutor: NodeExecutor<DiscordNodeData> = async ({
       discordChannel().status({
         nodeId,
         status: "error",
-      })
+      }),
     );
 
     throw error;
